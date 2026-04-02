@@ -4,6 +4,7 @@ spring:
       enabled: false
   thymeleaf:
     cache: false
+    prefix: file:src/main/resources/templates/
   devtools:
     restart:
       additional-paths:
