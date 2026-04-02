@@ -1,7 +1,7 @@
 package com.azadi.auth;
 
 import com.azadi.agreement.Agreement;
-import com.google.cloud.spring.data.datastore.core.DatastoreTemplate;
+import com.azadi.agreement.AgreementRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +23,10 @@ import static org.mockito.Mockito.when;
 class AuthServiceTest {
 
     @Mock
-    private DatastoreTemplate datastoreTemplate;
+    private AgreementRepository agreementRepository;
+
+    @Mock
+    private CustomerRepository customerRepository;
 
     @Mock
     private LoginAttemptTracker loginAttemptTracker;
@@ -39,7 +41,8 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authenticationProvider = new AzadiAuthenticationProvider(datastoreTemplate, loginAttemptTracker);
+        authenticationProvider = new AzadiAuthenticationProvider(
+            agreementRepository, customerRepository, loginAttemptTracker);
     }
 
     @Test
@@ -50,8 +53,10 @@ class AuthServiceTest {
         Customer customer = buildCustomer(CUSTOMER_ID, DOB, POSTCODE);
 
         when(loginAttemptTracker.isBlocked(AGREEMENT_NUMBER)).thenReturn(false);
-        when(datastoreTemplate.findAll(Agreement.class)).thenReturn(List.of(agreement));
-        when(datastoreTemplate.findAll(Customer.class)).thenReturn(List.of(customer));
+        when(agreementRepository.findByAgreementNumber(AGREEMENT_NUMBER))
+            .thenReturn(Optional.of(agreement));
+        when(customerRepository.findByCustomerId(CUSTOMER_ID))
+            .thenReturn(Optional.of(customer));
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 AGREEMENT_NUMBER, DOB_STRING + "|" + POSTCODE);
@@ -76,8 +81,10 @@ class AuthServiceTest {
         Customer customer = buildCustomer(CUSTOMER_ID, DOB, POSTCODE);
 
         when(loginAttemptTracker.isBlocked(AGREEMENT_NUMBER)).thenReturn(false);
-        when(datastoreTemplate.findAll(Agreement.class)).thenReturn(List.of(agreement));
-        when(datastoreTemplate.findAll(Customer.class)).thenReturn(List.of(customer));
+        when(agreementRepository.findByAgreementNumber(AGREEMENT_NUMBER))
+            .thenReturn(Optional.of(agreement));
+        when(customerRepository.findByCustomerId(CUSTOMER_ID))
+            .thenReturn(Optional.of(customer));
 
         String wrongDob = "01/01/1985";
         Authentication auth = new UsernamePasswordAuthenticationToken(
@@ -97,8 +104,10 @@ class AuthServiceTest {
         Customer customer = buildCustomer(CUSTOMER_ID, DOB, POSTCODE);
 
         when(loginAttemptTracker.isBlocked(AGREEMENT_NUMBER)).thenReturn(false);
-        when(datastoreTemplate.findAll(Agreement.class)).thenReturn(List.of(agreement));
-        when(datastoreTemplate.findAll(Customer.class)).thenReturn(List.of(customer));
+        when(agreementRepository.findByAgreementNumber(AGREEMENT_NUMBER))
+            .thenReturn(Optional.of(agreement));
+        when(customerRepository.findByCustomerId(CUSTOMER_ID))
+            .thenReturn(Optional.of(customer));
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 AGREEMENT_NUMBER, DOB_STRING + "|M1 1AE");
@@ -114,7 +123,8 @@ class AuthServiceTest {
     void nonExistentAgreementThrowsBadCredentials() {
         // Arrange
         when(loginAttemptTracker.isBlocked("AGR-999")).thenReturn(false);
-        when(datastoreTemplate.findAll(Agreement.class)).thenReturn(Collections.emptyList());
+        when(agreementRepository.findByAgreementNumber("AGR-999"))
+            .thenReturn(Optional.empty());
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 "AGR-999", DOB_STRING + "|" + POSTCODE);
@@ -133,8 +143,10 @@ class AuthServiceTest {
         Customer customer = buildCustomer(CUSTOMER_ID, DOB, "SW1A 1AA");
 
         when(loginAttemptTracker.isBlocked(AGREEMENT_NUMBER)).thenReturn(false);
-        when(datastoreTemplate.findAll(Agreement.class)).thenReturn(List.of(agreement));
-        when(datastoreTemplate.findAll(Customer.class)).thenReturn(List.of(customer));
+        when(agreementRepository.findByAgreementNumber(AGREEMENT_NUMBER))
+            .thenReturn(Optional.of(agreement));
+        when(customerRepository.findByCustomerId(CUSTOMER_ID))
+            .thenReturn(Optional.of(customer));
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 AGREEMENT_NUMBER, DOB_STRING + "|sw1a 1aa");

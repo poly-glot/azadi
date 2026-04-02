@@ -1,7 +1,6 @@
 package com.azadi.auth;
 
-import com.google.cloud.spring.data.datastore.core.DatastoreTemplate;
-import com.azadi.agreement.Agreement;
+import com.azadi.agreement.AgreementRepository;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,12 +19,15 @@ public class AzadiAuthenticationProvider implements AuthenticationProvider {
 
     private static final DateTimeFormatter DOB_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final DatastoreTemplate datastoreTemplate;
+    private final AgreementRepository agreementRepository;
+    private final CustomerRepository customerRepository;
     private final LoginAttemptTracker loginAttemptTracker;
 
-    public AzadiAuthenticationProvider(DatastoreTemplate datastoreTemplate,
+    public AzadiAuthenticationProvider(AgreementRepository agreementRepository,
+                                       CustomerRepository customerRepository,
                                        LoginAttemptTracker loginAttemptTracker) {
-        this.datastoreTemplate = datastoreTemplate;
+        this.agreementRepository = agreementRepository;
+        this.customerRepository = customerRepository;
         this.loginAttemptTracker = loginAttemptTracker;
     }
 
@@ -55,10 +57,7 @@ public class AzadiAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Invalid date of birth format.");
         }
 
-        var agreements = datastoreTemplate.findAll(Agreement.class);
-        var matchingAgreement = agreements.stream()
-            .filter(a -> agreementNumber.equals(a.getAgreementNumber()))
-            .findFirst()
+        var matchingAgreement = agreementRepository.findByAgreementNumber(agreementNumber)
             .orElse(null);
 
         if (matchingAgreement == null) {
@@ -68,10 +67,7 @@ public class AzadiAuthenticationProvider implements AuthenticationProvider {
 
         var customerId = matchingAgreement.getCustomerId();
 
-        var customers = datastoreTemplate.findAll(Customer.class);
-        var customer = customers.stream()
-            .filter(c -> customerId.equals(c.getCustomerId()))
-            .findFirst()
+        var customer = customerRepository.findByCustomerId(customerId)
             .orElse(null);
 
         if (customer == null) {

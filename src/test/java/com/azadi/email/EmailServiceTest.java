@@ -2,6 +2,7 @@ package com.azadi.email;
 
 import com.azadi.auth.Customer;
 import com.azadi.auth.CustomerRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.http.HttpClient;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -30,7 +32,8 @@ class EmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = new EmailService("re_test_mock", "test@azadi.test", customerRepository);
+        emailService = new EmailService("re_test_mock", "test@azadi.test",
+            customerRepository, new ObjectMapper(), HttpClient.newHttpClient());
     }
 
     @Test

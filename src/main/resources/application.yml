@@ -13,6 +13,7 @@ spring:
 
 server:
   port: 8080
+  forward-headers-strategy: framework
   servlet:
     session:
       timeout: 15m
@@ -32,7 +33,8 @@ resend:
   from-email: ${RESEND_FROM_EMAIL:noreply@junaid.guru}
 
 azadi:
-  encryption-key: ${AZADI_ENCRYPTION_KEY:dev-only-key-change-in-prod}
+  encryption-key: ${AZADI_ENCRYPTION_KEY:}
+  encryption-salt: ${AZADI_ENCRYPTION_SALT:}
   app-domain: ${APP_DOMAIN:localhost:8080}
 
 management:

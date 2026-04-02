@@ -8,12 +8,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class InputSanitizerTest {
 
     @Test
-    @DisplayName("Strips script tags completely")
+    @DisplayName("Strips script tags and their content completely")
     void stripsScriptTags() {
         String result = InputSanitizer.sanitize("<script>alert(1)</script>");
-        assertThat(result).isEqualTo("alert(1)");
-        // Script tags are stripped but text content remains — the sanitizer prevents XSS
-        // by removing HTML tags, not by removing all text content within script tags
+        assertThat(result).isEmpty();
     }
 
     @Test
