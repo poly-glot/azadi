@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header th:fragment="header" class="c-site-header">
+  <div class="o-wrapper c-site-header__wrapper">
+    <a th:href="@{/}" class="c-site-header__brand">
+      <img th:src="@{/assets/img/logo-azadi.svg}" alt="" class="c-site-header__logo">
+      <span class="c-site-header__title">Financial Services</span>
+    </a>
+
+    <div class="c-site-header__nav">
+      <!-- Desktop nav (authenticated) -->
+      <nav sec:authorize="isAuthenticated()" class="c-site-header__nav--desktop">
+        <a th:href="@{/finance/make-a-payment}" class="c-button">Make a Payment</a>
+        <a th:href="@{/logout}" class="c-button c-button--secondary" style="color: #fff; border-color: #fff;">Logout</a>
+      </nav>
+
+      <!-- Mobile hamburger (authenticated) -->
+      <button sec:authorize="isAuthenticated()"
+              class="c-site-header__burger"
+              data-mobile-menu-toggle
+              aria-expanded="false"
+              aria-controls="mobile-menu"
+              aria-label="Toggle navigation menu">
+        <span data-label-open aria-hidden="true">&#9776;</span>
+        <span data-label-close aria-hidden="true" hidden>&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu (authenticated) -->
+  <div sec:authorize="isAuthenticated()"
+       class="c-mobile-menu"
+       id="mobile-menu"
+       data-mobile-menu>
+    <div class="o-wrapper u-padding-vertical">
+      <nav>
+        <div class="c-nav-item">
+          <a th:href="@{/my-account}"
+             th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/my-account')} ? 'c-nav-link--active' : ''"
+             class="c-nav-link">
+            <span class="c-nav-link__label">My Account</span>
+          </a>
+        </div>
+
+        <div class="c-nav-item">
+          <a th:href="@{/my-documents}"
+             th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/my-documents')} ? 'c-nav-link--active' : ''"
+             class="c-nav-link">
+            <span class="c-nav-link__label">
+              <span th:if="${unreadDocuments != null and unreadDocuments > 0}"
+                    th:text="'(' + ${unreadDocuments} + ') '">
+              </span>My Documents
+            </span>
+          </a>
+        </div>
+
+        <details class="c-nav-details"
+                 th:open="${#strings.contains(#httpServletRequest.requestURI, '/finance/')}">
+          <summary>
+            <span class="c-nav-link__label">Manage My Finance</span>
+            <span class="c-nav-details__indicator" aria-hidden="true">+</span>
+          </summary>
+          <div class="c-nav-sub">
+            <a th:href="@{/finance/make-a-payment}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/make-a-payment')} ? 'c-nav-sub__link--active' : ''">
+              Make a Payment
+            </a>
+            <a th:href="@{/finance/change-payment-date}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/change-payment-date')} ? 'c-nav-sub__link--active' : ''">
+              Change Payment Date
+            </a>
+            <a th:href="@{/finance/settlement-figure}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/settlement-figure')} ? 'c-nav-sub__link--active' : ''">
+              Settlement Figure
+            </a>
+            <a th:href="@{/finance/request-a-statement}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/request-a-statement')} ? 'c-nav-sub__link--active' : ''">
+              Request a Statement
+            </a>
+            <a th:href="@{/finance/update-bank-details}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/update-bank-details')} ? 'c-nav-sub__link--active' : ''">
+              Update Bank Details
+            </a>
+          </div>
+        </details>
+
+        <div class="c-nav-item">
+          <a th:href="@{/my-contact-details}"
+             th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/my-contact-details')} ? 'c-nav-link--active' : ''"
+             class="c-nav-link">
+            <span class="c-nav-link__label">My Contact Details</span>
+          </a>
+        </div>
+
+        <details class="c-nav-details"
+                 th:open="${#strings.contains(#httpServletRequest.requestURI, '/help/')}">
+          <summary>
+            <span class="c-nav-link__label">Help</span>
+            <span class="c-nav-details__indicator" aria-hidden="true">+</span>
+          </summary>
+          <div class="c-nav-sub">
+            <a th:href="@{/help/faqs}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/faqs')} ? 'c-nav-sub__link--active' : ''">
+              FAQs
+            </a>
+            <a th:href="@{/help/ways-to-pay}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/ways-to-pay')} ? 'c-nav-sub__link--active' : ''">
+              Ways to Pay
+            </a>
+            <a th:href="@{/help/contact-us}" class="c-nav-sub__link"
+               th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/contact-us')} ? 'c-nav-sub__link--active' : ''">
+              Contact Us
+            </a>
+          </div>
+        </details>
+      </nav>
+    </div>
+
+    <nav class="c-mobile-menu__shortcuts">
+      <a th:href="@{/finance/make-a-payment}" class="c-button c-button--block">Make a Payment</a>
+      <a th:href="@{/logout}" class="c-button c-button--secondary c-button--block">Logout</a>
+    </nav>
+  </div>
+</header>
+</body>
+</html>

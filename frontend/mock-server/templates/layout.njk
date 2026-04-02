@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} - Azadi Financial Services</title>
+  <meta name="description" content="Azadi Financial Services customer portal">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="icon" href="/assets/img/logo-azadi.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  {% if viteUrl %}
+  <script type="module" src="{{ viteUrl }}/@vite/client"></script>
+  <link rel="stylesheet" href="{{ viteUrl }}/css/main.css">
+  {% else %}
+  <link rel="stylesheet" href="/assets/css/main.css">
+  {% endif %}
+</head>
+<body>
+  <!-- Header -->
+  <header class="c-site-header">
+    <div class="o-wrapper c-site-header__wrapper">
+      <a href="/" class="c-site-header__brand">
+        <img src="/assets/img/logo-azadi.svg" alt="" class="c-site-header__logo">
+        <span class="c-site-header__title">Financial Services</span>
+      </a>
+
+      <div class="c-site-header__nav">
+        {% if isAuthenticated %}
+        <nav class="c-site-header__nav--desktop">
+          <a href="/finance/make-a-payment" class="c-button">Make a Payment</a>
+          <a href="/logout" class="c-button c-button--secondary" style="color: #fff; border-color: #fff;">Logout</a>
+        </nav>
+        <button class="c-site-header__burger" data-mobile-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle navigation menu">
+          <span data-label-open aria-hidden="true">&#9776;</span>
+          <span data-label-close aria-hidden="true" hidden>&times;</span>
+        </button>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if isAuthenticated %}
+    <div class="c-mobile-menu" id="mobile-menu" data-mobile-menu>
+      <div class="o-wrapper u-padding-vertical">
+        <nav>
+          <div class="c-nav-item">
+            <a href="/my-account" class="c-nav-link {% if currentUrl == '/my-account' %}c-nav-link--active{% endif %}">
+              <span class="c-nav-link__label">My Account</span>
+            </a>
+          </div>
+          <div class="c-nav-item">
+            <a href="/my-documents" class="c-nav-link {% if currentUrl == '/my-documents' %}c-nav-link--active{% endif %}">
+              <span class="c-nav-link__label">{% if unreadDocuments %}({{ unreadDocuments }}) {% endif %}My Documents</span>
+            </a>
+          </div>
+          <details class="c-nav-details" {% if '/finance/' in currentUrl %}open{% endif %}>
+            <summary>
+              <span class="c-nav-link__label">Manage My Finance</span>
+              <span class="c-nav-details__indicator" aria-hidden="true">+</span>
+            </summary>
+            <div class="c-nav-sub">
+              <a href="/finance/make-a-payment" class="c-nav-sub__link {% if '/make-a-payment' in currentUrl %}c-nav-sub__link--active{% endif %}">Make a Payment</a>
+              <a href="/finance/change-payment-date" class="c-nav-sub__link {% if '/change-payment-date' in currentUrl %}c-nav-sub__link--active{% endif %}">Change Payment Date</a>
+              <a href="/finance/settlement-figure" class="c-nav-sub__link {% if '/settlement-figure' in currentUrl %}c-nav-sub__link--active{% endif %}">Settlement Figure</a>
+              <a href="/finance/request-a-statement" class="c-nav-sub__link {% if '/request-a-statement' in currentUrl %}c-nav-sub__link--active{% endif %}">Request a Statement</a>
+              <a href="/finance/update-bank-details" class="c-nav-sub__link {% if '/update-bank-details' in currentUrl %}c-nav-sub__link--active{% endif %}">Update Bank Details</a>
+            </div>
+          </details>
+          <div class="c-nav-item">
+            <a href="/my-contact-details" class="c-nav-link {% if '/my-contact-details' in currentUrl %}c-nav-link--active{% endif %}">
+              <span class="c-nav-link__label">My Contact Details</span>
+            </a>
+          </div>
+          <details class="c-nav-details" {% if '/help/' in currentUrl %}open{% endif %}>
+            <summary>
+              <span class="c-nav-link__label">Help</span>
+              <span class="c-nav-details__indicator" aria-hidden="true">+</span>
+            </summary>
+            <div class="c-nav-sub">
+              <a href="/help/faqs" class="c-nav-sub__link">FAQs</a>
+              <a href="/help/ways-to-pay" class="c-nav-sub__link">Ways to Pay</a>
+              <a href="/help/contact-us" class="c-nav-sub__link">Contact Us</a>
+            </div>
+          </details>
+        </nav>
+      </div>
+      <nav class="c-mobile-menu__shortcuts">
+        <a href="/finance/make-a-payment" class="c-button c-button--block">Make a Payment</a>
+        <a href="/logout" class="c-button c-button--secondary c-button--block">Logout</a>
+      </nav>
+    </div>
+    {% endif %}
+  </header>
+
+  {% if isAuthenticated %}
+  <!-- Toolbar -->
+  <div class="c-toolbar">
+    <div class="o-wrapper">
+      <p class="c-toolbar__greeting"><strong>Hello</strong> {{ customerName }}</p>
+    </div>
+  </div>
+
+  <div class="o-band o-band--md">
+    <div class="o-wrapper">
+      <div class="o-layout o-layout--medium o-layout--sidebar">
+        <!-- Sidebar -->
+        <aside class="c-sidebar-nav">
+          {% include "partials/sidebar-nav.njk" %}
+        </aside>
+
+        <!-- Main content -->
+        <main>
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+  </div>
+  {% else %}
+    {% block content_public %}{% endblock %}
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="c-site-navigation">
+    <div class="o-wrapper">
+      <div class="c-site-navigation__links">
+        <a href="#">Help and Support</a>
+        <a href="#">Azadi UK</a>
+        <a href="#">Cookies Policy</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </div>
+  <footer class="c-site-footer">
+    <div class="o-wrapper">
+      <div class="c-site-footer__legal">
+        <p>Azadi Motors Limited: Registered office: Abbey Road, Whitley, Coventry CV3 4LF. Registered in England No: 1672070</p>
+        <p>The figures provided are as a result of official manufacturer's tests in accordance with EU legislation. A vehicle's actual fuel consumption may differ from that achieved in such tests and these figures are for comparative purposes only.</p>
+      </div>
+    </div>
+  </footer>
+
+  {% if viteUrl %}
+  <script type="module" src="{{ viteUrl }}/js/main.js"></script>
+  {% else %}
+  <script type="module" src="/assets/js/main.js"></script>
+  {% endif %}
+</body>
+</html>

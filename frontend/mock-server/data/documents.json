@@ -1,0 +1,44 @@
+[
+  {
+    "id": "doc-001",
+    "fileName": "Finance_Agreement.doc",
+    "fileType": "doc",
+    "dateCreated": "2025-01-15",
+    "unread": true
+  },
+  {
+    "id": "doc-002",
+    "fileName": "Finance_Agreement.pdf",
+    "fileType": "pdf",
+    "dateCreated": "2025-01-15",
+    "unread": true
+  },
+  {
+    "id": "doc-003",
+    "fileName": "Statement_Q4_2024.pdf",
+    "fileType": "pdf",
+    "dateCreated": "2024-12-31",
+    "unread": false
+  },
+  {
+    "id": "doc-004",
+    "fileName": "Payment_Schedule.doc",
+    "fileType": "doc",
+    "dateCreated": "2024-11-01",
+    "unread": false
+  },
+  {
+    "id": "doc-005",
+    "fileName": "Insurance_Certificate.pdf",
+    "fileType": "pdf",
+    "dateCreated": "2024-10-15",
+    "unread": false
+  },
+  {
+    "id": "doc-006",
+    "fileName": "Settlement_Quote.doc",
+    "fileType": "doc",
+    "dateCreated": "2024-09-20",
+    "unread": false
+  }
+]

@@ -1,0 +1,38 @@
+spring:
+  cloud:
+    gcp:
+      datastore:
+        emulator:
+          enabled: true
+        project-id: test-project
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
+        same-site: lax
+        http-only: true
+        name: AZADI_SESSION
+  docker:
+    compose:
+      enabled: false
+  thymeleaf:
+    cache: false
+
+stripe:
+  api-key: sk_test_mock
+  webhook-secret: whsec_test_mock
+  publishable-key: pk_test_mock
+
+resend:
+  api-key: re_test_mock
+  from-email: test@azadi.test
+
+azadi:
+  encryption-key: test-encryption-key-32chars!!!
+  app-domain: localhost
+
+logging:
+  level:
+    com.azadi: DEBUG

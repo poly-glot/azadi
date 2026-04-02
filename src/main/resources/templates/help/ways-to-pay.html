@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <title>Ways to Pay</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">Ways to Pay</h1>
+
+  <details class="c-accordion c-accordion--spaced">
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Direct Debit</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel c-accordion__panel--shadow">
+      <p>Direct Debit is the easiest way to pay. Your payments are automatically collected from your bank account on your chosen payment date each month.</p>
+    </div>
+  </details>
+
+  <details class="c-accordion c-accordion--spaced">
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Debit Card</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel c-accordion__panel--shadow">
+      <p>You can make a one-off payment using your debit card through our online payment facility or by calling our customer services team.</p>
+    </div>
+  </details>
+
+  <details class="c-accordion c-accordion--spaced" open>
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Bank Transfer</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel c-accordion__panel--shadow">
+      <p>You can pay us online through your own bank account. Use your agreement number as the reference and the following bank details:</p>
+      <p><strong>Sort code:</strong> 30-15-99</p>
+      <p><strong>Account number:</strong> 00580901</p>
+    </div>
+  </details>
+
+  <details class="c-accordion c-accordion--spaced">
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Standing Order</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel c-accordion__panel--shadow">
+      <p>You can set up a standing order with your bank to make regular payments to us. Please use your agreement number as the reference.</p>
+    </div>
+  </details>
+
+  <details class="c-accordion c-accordion--spaced">
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Cheque</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel c-accordion__panel--shadow">
+      <p>You can send a cheque made payable to "Azadi Financial Services" to our head office address. Please write your agreement number on the back of the cheque.</p>
+    </div>
+  </details>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+node_modules/
+frontend/dist/
+.idea/
+*.iml
+.vscode/
+*.class
+*.log
+local.env
+.env
+.firebase/
+.firebaserc.local

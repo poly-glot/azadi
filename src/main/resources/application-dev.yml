@@ -1,0 +1,14 @@
+spring:
+  thymeleaf:
+    cache: false
+  cloud:
+    gcp:
+      datastore:
+        emulator:
+          enabled: true
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false

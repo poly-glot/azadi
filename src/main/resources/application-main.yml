@@ -1,0 +1,17 @@
+spring:
+  thymeleaf:
+    cache: true
+  cloud:
+    gcp:
+      secretmanager:
+        enabled: true
+
+stripe:
+  api-key: ${sm://azadi-stripe-api-key}
+  webhook-secret: ${sm://azadi-stripe-webhook-secret}
+
+resend:
+  api-key: ${sm://azadi-resend-api-key}
+
+azadi:
+  encryption-key: ${sm://azadi-encryption-key}

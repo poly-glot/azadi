@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    gcp:
+      datastore:
+        emulator:
+          enabled: true
+  docker:
+    compose:
+      enabled: false
+
+stripe:
+  api-key: sk_test_mock
+  webhook-secret: whsec_test_mock
+
+resend:
+  api-key: re_test_mock
+  from-email: test@azadi.test
+
+azadi:
+  encryption-key: test-encryption-key-32chars!!!

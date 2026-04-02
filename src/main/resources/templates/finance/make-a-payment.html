@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <title>Make a Payment</title>
+  <script src="https://js.stripe.com/v3/" th:attr="nonce=${cspNonce}"></script>
+</head>
+<body>
+<div layout:fragment="content">
+
+  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">Make a Payment</h1>
+
+  <div class="u-margin-bottom-normal">
+    <p>Please tell us how much you would like to pay and input your card details, then click 'Pay'.</p>
+  </div>
+
+  <!-- Success message -->
+  <div th:if="${param.success}" class="c-alert c-alert--success" role="alert">
+    Your payment has been processed successfully.
+  </div>
+
+  <form th:action="@{/finance/make-a-payment}" method="post" id="payment-form"
+        th:attr="data-stripe-key=${stripePublicKey}" class="u-margin-bottom-normal">
+
+    <!-- Payment Amount -->
+    <div class="c-panel c-panel--header">
+      <div class="c-panel__inner">
+        <div class="c-form__field c-form__field--none">
+          <label for="amount" class="c-form__label">Payment Amount</label>
+          <div class="c-input-placeholder">
+            <div class="c-input-placeholder__icon">£</div>
+            <input type="text" name="amount" id="amount" class="c-input"
+                   style="padding-inline-start: 2rem;"
+                   placeholder="500"
+                   th:value="${amount}"
+                   inputmode="decimal"
+                   required>
+          </div>
+          <p class="u-note u-margin-top">
+            <strong>Note:</strong> If you are making a payment over and above your normal monthly amount,
+            please contact us so that we can discuss Partial or Full Settlement options.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Input (Stripe Elements) -->
+    <div class="c-panel c-panel--content">
+      <div class="c-panel__inner">
+        <div class="c-form__field">
+          <label class="c-form__label">Card Details</label>
+          <div id="card-element"
+               style="padding: var(--spacing-small); border: 1px solid var(--color-gray-400); border-radius: var(--radius);">
+            <!-- Stripe Elements will mount here -->
+          </div>
+          <div id="card-errors" class="c-field-error" role="alert"></div>
+        </div>
+
+        <div class="c-form__actions">
+          <button type="submit" class="c-button">Pay</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Help section -->
+  <details class="c-accordion c-accordion--section" open>
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Help</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel">
+      <div>
+        Call Customer Services on:<br>
+        <strong style="font-size: var(--font-size-2xl);">0344 824 4732</strong>
+      </div>
+      <div class="u-margin-top">
+        Lines are open:<br>
+        <div class="c-table c-table--auto c-table--normal">
+          <div class="c-table__row">
+            <div class="c-table__column c-table__column--condense"><strong>Monday to Friday</strong></div>
+            <div class="c-table__column">8:30am - 6:00pm (excluding UK Bank Holidays)</div>
+          </div>
+          <div class="c-table__row">
+            <div class="c-table__column c-table__column--condense"><strong>Saturday</strong></div>
+            <div class="c-table__column">9:00am - 1:00pm</div>
+          </div>
+        </div>
+      </div>
+      <p class="u-margin-top">Calls will cost no more than a UK national rate call to 01 or 02 telephone numbers and
+        will also count towards inclusive UK call minutes provided in telephone and mobile phone contracts.</p>
+      <p>For customers who are hard of hearing or have speech difficulties, you can contact us using the
+        Text Relay (NGT) Service.</p>
+    </div>
+  </details>
+
+</div>
+</body>
+</html>

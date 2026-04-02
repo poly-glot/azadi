@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Components: Table
+   Financial data tables (div-based from static site).
+   ========================================================================== */
+
+.c-table {
+  width: 100%;
+  margin-block-end: var(--spacing-medium);
+}
+
+.c-table__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-block-end: 1px solid var(--border-color);
+}
+
+.c-table__row:last-child {
+  border-block-end: none;
+}
+
+.c-table__column {
+  padding: var(--spacing-small);
+  font-size: var(--font-size-sm);
+}
+
+.c-table__column--label {
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+
+.c-table__column--price {
+  font-weight: 600;
+  text-align: end;
+}
+
+/* Auto-width variant */
+.c-table--auto .c-table__row {
+  grid-template-columns: auto 1fr;
+}
+
+.c-table--auto .c-table__column--condense {
+  white-space: nowrap;
+}
+
+/* Normal padding variant */
+.c-table--normal .c-table__column {
+  padding: var(--spacing-tiny) var(--spacing-small);
+}

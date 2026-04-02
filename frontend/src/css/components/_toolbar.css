@@ -1,0 +1,16 @@
+/* ==========================================================================
+   Components: Toolbar
+   Greeting bar below header.
+   ========================================================================== */
+
+.c-toolbar {
+  background-color: var(--color-gray-200);
+  padding-block: var(--spacing-small);
+}
+
+.c-toolbar__greeting {
+  font-size: var(--font-size-md);
+  font-weight: 400;
+  margin: 0;
+  color: var(--color-primary);
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <title>My Documents</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">My Documents</h1>
+
+  <div class="c-documents">
+    <div th:if="${documents == null or documents.empty}" class="u-margin-vertical">
+      <p class="u-note">You have no documents available at this time.</p>
+    </div>
+
+    <a th:each="doc : ${documents}"
+       th:href="@{/documents/{id}(id=${doc.id})}"
+       class="c-documents__item"
+       th:classappend="${doc.unread} ? 'c-documents__item--new' : ''">
+      <div class="c-documents__icon">
+        <img th:src="@{/assets/img/file-icons/{type}.png(type=${doc.fileType ?: 'pdf'})}"
+             th:alt="${doc.fileName}" width="32" height="32">
+      </div>
+      <div class="c-documents__label">
+        <span th:text="${doc.fileName}">Finance_Agreement.pdf</span>
+        <span th:if="${doc.unread}" class="c-documents__sticker">New</span>
+      </div>
+      <div class="c-documents__indicator">
+        <span>Download</span>
+      </div>
+    </a>
+
+    <!--/* Static fallback for when no model data */-->
+    <th:block th:if="${documents == null}">
+      <a href="#" class="c-documents__item c-documents__item--new">
+        <div class="c-documents__icon">
+          <img th:src="@{/assets/img/file-icons/doc.png}" alt="Finance_Agreement.doc" width="32" height="32">
+        </div>
+        <div class="c-documents__label">
+          Finance_Agreement.doc
+          <span class="c-documents__sticker">New</span>
+        </div>
+        <div class="c-documents__indicator">
+          <span>Download</span>
+        </div>
+      </a>
+      <a href="#" class="c-documents__item c-documents__item--new">
+        <div class="c-documents__icon">
+          <img th:src="@{/assets/img/file-icons/pdf.png}" alt="Finance_Agreement.pdf" width="32" height="32">
+        </div>
+        <div class="c-documents__label">
+          Finance_Agreement.pdf
+          <span class="c-documents__sticker">New</span>
+        </div>
+        <div class="c-documents__indicator">
+          <span>Download</span>
+        </div>
+      </a>
+      <a href="#" class="c-documents__item">
+        <div class="c-documents__icon">
+          <img th:src="@{/assets/img/file-icons/pdf.png}" alt="Statement_Q1_2025.pdf" width="32" height="32">
+        </div>
+        <div class="c-documents__label">Statement_Q1_2025.pdf</div>
+        <div class="c-documents__indicator">
+          <span>Download</span>
+        </div>
+      </a>
+    </th:block>
+  </div>
+
+</div>
+</body>
+</html>

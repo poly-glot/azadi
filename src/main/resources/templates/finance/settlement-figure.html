@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <title>Settlement Figure</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">Settlement Figure</h1>
+
+  <div style="border-block-end: 2px solid var(--border-color); padding-block-end: var(--spacing-small); margin-block-end: var(--spacing-medium);">
+    <p class="u-h5 u-margin-bottom-none">
+      <strong>Agreement number: </strong>
+      <span th:text="${agreement.number ?: '12345 58936 54894'}">12345 58936 54894</span>
+    </p>
+  </div>
+
+  <div class="u-margin-bottom-normal">
+    <p class="u-small">
+      Please find below a settlement figure which is the amount we require to pay off your agreement in full.<br>
+      <strong>Note:</strong> We have sent a paper copy of the settlement figure to your home address.
+      You will receive this within five working days.
+    </p>
+  </div>
+
+  <!-- Settlement hero -->
+  <div class="c-panel c-panel--hero u-margin-bottom-normal">
+    <div class="c-panel__inner">
+      <p style="font-size: var(--font-size-3xl); font-weight: 400; margin-block-end: var(--spacing-small);"
+         th:text="${settlement.amount ?: '£29,367.67'}">£29,367.67</p>
+      <p>
+        <strong class="u-prominent">Settlement expires on:</strong>
+        <span th:text="${settlement.expiryDate ?: '15/12/2025'}">15/12/2025</span>
+      </p>
+      <div style="display: flex; gap: var(--spacing-small); justify-content: center; flex-wrap: wrap;">
+        <a th:href="@{/finance/make-a-payment}" class="c-button c-button--cta" style="background: #fff; color: var(--color-primary); border-color: #fff;">Settle Now</a>
+        <a th:href="@{/help/ways-to-pay}" class="c-button c-button--cta c-button--secondary" style="color: #fff; border-color: #fff;">Ways to Pay</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Last Payment -->
+  <details class="c-accordion c-accordion--section" open>
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Last Payment</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel c-accordion__panel--shadow">
+      <div class="c-table">
+        <div class="c-table__row">
+          <div class="c-table__column c-table__column--label">Payment amount:</div>
+          <div class="c-table__column c-table__column--price" th:text="${settlement.lastPaymentAmount ?: '£438.78'}">£438.78</div>
+        </div>
+        <div class="c-table__row">
+          <div class="c-table__column c-table__column--label">Date of payment:</div>
+          <div class="c-table__column c-table__column--price" th:text="${settlement.lastPaymentDate ?: '08/06/18'}">08/06/18</div>
+        </div>
+      </div>
+      <div style="padding: var(--spacing-small) var(--spacing-medium);">
+        <p class="u-note"><strong>Note:</strong> Should you make any payments between now and this settlement date please
+          allow three working days for the payment to be processed before re-visiting this site to obtain
+          an up to date settlement figure.</p>
+      </div>
+    </div>
+  </details>
+
+  <!-- Settlement by text -->
+  <details class="c-accordion c-accordion--section" open>
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Settlement Figure By Text</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel">
+      <p class="u-note">
+        To receive a copy of this settlement figure via text message please enter your mobile number.<br>
+        We will not charge you for this service.
+      </p>
+
+      <form th:action="@{/finance/settlement-figure/sms}" method="post" class="u-margin-top-normal">
+        <div class="c-form__field c-form__field--none">
+          <label for="mobile" class="c-form__label u-small">
+            Mobile Number<span class="u-color-default">*</span>
+          </label>
+          <div class="c-input-group">
+            <input type="tel" name="mobileNumber" id="mobile" class="c-input"
+                   placeholder="Mobile number" required>
+            <button type="submit" class="c-button">Send</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </details>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <title>Change Payment Date</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">Change Payment Date</h1>
+
+  <div class="c-alert c-alert--danger">
+    <strong>Note:</strong> Only one payment date change is allowed during the lifetime of your agreement.
+    Changing your payment date may incur additional interest.
+  </div>
+
+  <!-- Success message -->
+  <div th:if="${success}" class="c-alert c-alert--success" role="alert">
+    Your payment date has been changed successfully.
+  </div>
+
+  <form th:action="@{/finance/change-payment-date}" method="post" class="u-margin-bottom-normal">
+
+    <div class="c-panel c-panel--header">
+      <div class="c-panel__inner">
+        <strong>Current payment date:</strong>
+        <span th:text="${currentPaymentDate ?: '8th'}">8th</span>
+      </div>
+    </div>
+
+    <div class="c-panel c-panel--content">
+      <div class="c-panel__inner">
+        <div class="c-form__field">
+          <label for="newPaymentDate" class="c-form__label">New payment date:</label>
+          <select name="newPaymentDate" id="newPaymentDate" class="c-select c-select--small" required>
+            <option th:each="d : ${#numbers.sequence(1, 28)}"
+                    th:value="${d}"
+                    th:text="${d + (#strings.toString(d).endsWith('1') and d != 11 ? 'st' : (#strings.toString(d).endsWith('2') and d != 12 ? 'nd' : (#strings.toString(d).endsWith('3') and d != 13 ? 'rd' : 'th')))}"
+                    th:selected="${d == currentPaymentDay}">
+            </option>
+          </select>
+        </div>
+
+        <div class="c-form__field">
+          <label class="c-option">
+            <input type="checkbox" name="confirmChange" class="c-option__input" value="true" required>
+            <span class="c-option__label">I understand that changing my payment date may incur additional interest and I wish to proceed.</span>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: var(--spacing-small); flex-wrap: wrap;">
+          <a th:href="@{/my-account}" class="c-button c-button--cta c-button--secondary">Cancel</a>
+          <button type="submit" class="c-button c-button--cta">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Help section -->
+  <details class="c-accordion c-accordion--section" open>
+    <summary class="c-accordion__summary">
+      <span class="c-accordion__label">Help</span>
+      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+    </summary>
+    <div class="c-accordion__panel">
+      <div>
+        Call Customer Services on:<br>
+        <strong style="font-size: var(--font-size-2xl);">0344 824 4732</strong>
+      </div>
+      <div class="u-margin-top">
+        Lines are open:<br>
+        <div class="c-table c-table--auto c-table--normal">
+          <div class="c-table__row">
+            <div class="c-table__column c-table__column--condense"><strong>Monday to Friday</strong></div>
+            <div class="c-table__column">8:30am - 6:00pm (excluding UK Bank Holidays)</div>
+          </div>
+          <div class="c-table__row">
+            <div class="c-table__column c-table__column--condense"><strong>Saturday</strong></div>
+            <div class="c-table__column">9:00am - 1:00pm</div>
+          </div>
+        </div>
+      </div>
+      <p class="u-margin-top">Calls will cost no more than a UK national rate call to 01 or 02 telephone numbers.</p>
+      <p>For customers who are hard of hearing or have speech difficulties, you can contact us using the Text Relay (NGT) Service.</p>
+    </div>
+  </details>
+
+</div>
+</body>
+</html>

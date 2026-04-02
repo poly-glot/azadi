@@ -1,0 +1,28 @@
+/* ==========================================================================
+   Utilities: Text
+   Text alignment, sizing, and decoration utilities.
+   ========================================================================== */
+
+.u-text-center { text-align: center !important; }
+.u-text-end { text-align: end !important; }
+.u-text-start { text-align: start !important; }
+
+.u-small { font-size: var(--font-size-sm) !important; }
+.u-note { font-size: var(--font-size-sm) !important; color: var(--color-gray-600) !important; }
+.u-prominent { font-weight: 600 !important; }
+.u-normal { font-weight: 400 !important; }
+.u-condense { line-height: 1.2 !important; }
+.u-large { font-size: var(--font-size-3xl) !important; }
+
+.u-color-error { color: var(--color-error) !important; }
+.u-color-default { color: var(--color-primary) !important; }
+
+.u-truncate {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.u-h5 {
+  font-size: var(--font-size-md) !important;
+}

@@ -1,0 +1,26 @@
+/* ==========================================================================
+   Objects: Band
+   Full-width section with background support.
+   ========================================================================== */
+
+.o-band {
+  padding-block: var(--spacing-large);
+}
+
+.o-band--md {
+  padding-block: var(--spacing-medium);
+  flex: 1;
+}
+
+.o-band--fullscreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.o-band--gray {
+  background-color: var(--color-gray-100);
+}

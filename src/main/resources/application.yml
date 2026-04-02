@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: azadi
+  thymeleaf:
+    cache: false
+  cloud:
+    gcp:
+      datastore:
+        project-id: ${GCP_PROJECT_ID:test-project}
+        database-id: ${FIRESTORE_DB:azadi}
+  session:
+    timeout: 15m
+
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 15m
+      cookie:
+        http-only: true
+        secure: true
+        same-site: strict
+        name: AZADI_SESSION
+
+stripe:
+  api-key: ${STRIPE_API_KEY:}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+  publishable-key: ${VITE_STRIPE_PUBLISHABLE_KEY:}
+
+resend:
+  api-key: ${RESEND_API_KEY:}
+  from-email: ${RESEND_FROM_EMAIL:noreply@junaid.guru}
+
+azadi:
+  encryption-key: ${AZADI_ENCRYPTION_KEY:dev-only-key-change-in-prod}
+  app-domain: ${APP_DOMAIN:localhost:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

@@ -1,0 +1,10 @@
+/* ==========================================================================
+   Objects: Wrapper
+   Max-width constraint container.
+   ========================================================================== */
+
+.o-wrapper {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--spacing-medium);
+}

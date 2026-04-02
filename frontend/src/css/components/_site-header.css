@@ -1,0 +1,108 @@
+/* ==========================================================================
+   Components: Site Header
+   ========================================================================== */
+
+.c-site-header {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 100;
+}
+
+.c-site-header__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.5rem;
+}
+
+.c-site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  text-decoration: none;
+  color: var(--color-white);
+}
+
+.c-site-header__logo {
+  height: 1.75rem;
+  width: auto;
+}
+
+.c-site-header__title {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-white);
+}
+
+.c-site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+}
+
+.c-site-header__nav--desktop {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .c-site-header__nav--desktop {
+    display: flex;
+  }
+}
+
+/* Hamburger menu */
+.c-site-header__burger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  font-size: 1.5rem;
+  color: var(--color-white);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (min-width: 64rem) {
+  .c-site-header__burger {
+    display: none;
+  }
+}
+
+.c-site-header__burger:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+/* Mobile menu */
+.c-mobile-menu {
+  display: none;
+  background-color: var(--color-white);
+  border-block-end: 2px solid var(--color-primary);
+  max-height: calc(100vh - 3.5rem);
+  overflow-y: auto;
+}
+
+.c-mobile-menu.is-open {
+  display: block;
+}
+
+@media (min-width: 64rem) {
+  .c-mobile-menu {
+    display: none !important;
+  }
+}
+
+.c-mobile-menu__shortcuts {
+  padding: var(--spacing-medium);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-small);
+  border-block-start: 1px solid var(--border-color);
+}

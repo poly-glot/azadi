@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+
+    <!-- Tomcat embedded false positives -->
+    <suppress>
+        <notes>Tomcat embedded - managed by Spring Boot, not a standalone deployment</notes>
+        <gav regex="true">^org\.apache\.tomcat\.embed:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+
+    <!-- SnakeYAML false positives -->
+    <suppress>
+        <notes>SnakeYAML used internally by Spring Boot for YAML config parsing only</notes>
+        <gav regex="true">^org\.yaml:snakeyaml:.*$</gav>
+        <vulnerabilityName regex="true">^CVE-.*$</vulnerabilityName>
+    </suppress>
+
+    <!-- Spring Framework managed by Spring Boot BOM -->
+    <suppress>
+        <notes>Spring Framework version managed by Spring Boot parent BOM</notes>
+        <gav regex="true">^org\.springframework:.*$</gav>
+        <cpe>cpe:/a:vmware:spring_framework</cpe>
+    </suppress>
+</suppressions>

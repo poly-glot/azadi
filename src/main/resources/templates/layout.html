@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title layout:title-pattern="$CONTENT_TITLE - Azadi Financial Services">Azadi Financial Services</title>
+  <meta name="description" content="Azadi Financial Services customer portal">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="icon" th:href="@{/assets/img/logo-azadi.svg}">
+  <link rel="apple-touch-icon" th:href="@{/assets/img/logo-azadi.svg}">
+  <meta name="apple-mobile-web-app-title" content="AZADI FINANCE">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" th:attr="nonce=${cspNonce}">
+
+  <link rel="stylesheet" th:href="@{/assets/css/main.css}" th:attr="nonce=${cspNonce}">
+</head>
+<body>
+  <!-- Header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <!-- Toolbar (authenticated only) -->
+  <div sec:authorize="isAuthenticated()" class="c-toolbar">
+    <div class="o-wrapper">
+      <p class="c-toolbar__greeting">
+        <strong>Hello</strong> <span th:text="${customerName ?: 'Customer'}">John</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Main content area -->
+  <div sec:authorize="isAuthenticated()" class="o-band o-band--md">
+    <div class="o-wrapper">
+      <div class="o-layout o-layout--medium o-layout--sidebar">
+        <!-- Desktop sidebar -->
+        <aside class="c-sidebar-nav">
+          <div th:replace="~{fragments/sidebar-nav :: sidebar-nav}"></div>
+        </aside>
+
+        <!-- Page content -->
+        <main>
+          <div layout:fragment="content">
+            <!-- Page-specific content goes here -->
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unauthenticated content (login page) -->
+  <div sec:authorize="!isAuthenticated()">
+    <div layout:fragment="content-public">
+      <!-- Public page content goes here -->
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <script type="module" th:src="@{/assets/js/main.js}" th:attr="nonce=${cspNonce}"></script>
+</body>
+</html>

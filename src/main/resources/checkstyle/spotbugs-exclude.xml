@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude DTOs (records) -->
+    <Match>
+        <Package name="~com\.azadi\..*\.dto"/>
+    </Match>
+
+    <!-- Exclude config classes -->
+    <Match>
+        <Package name="com.azadi.config"/>
+    </Match>
+
+    <!-- Exclude application entry point -->
+    <Match>
+        <Class name="com.azadi.AzadiApplication"/>
+    </Match>
+
+    <!-- Exclude seed data -->
+    <Match>
+        <Package name="com.azadi.seed"/>
+    </Match>
+
+    <!-- Mutable fields exposed via getters in entities - expected for Datastore -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Or>
+            <Class name="~.*Response"/>
+            <Class name="~.*Request"/>
+            <Class name="~.*Controller"/>
+            <Class name="~.*Service"/>
+            <Class name="~.*Repository"/>
+            <Class name="~.*Agreement"/>
+            <Class name="~.*Customer"/>
+            <Class name="~.*PaymentRecord"/>
+            <Class name="~.*BankDetails"/>
+            <Class name="~.*Document"/>
+            <Class name="~.*AuditEvent"/>
+            <Class name="~.*SettlementFigure"/>
+            <Class name="~.*StatementRequest"/>
+            <Class name="~.*SeedMarker"/>
+        </Or>
+    </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Or>
+            <Class name="~.*Response"/>
+            <Class name="~.*Request"/>
+            <Class name="~.*Controller"/>
+            <Class name="~.*Service"/>
+            <Class name="~.*Repository"/>
+            <Class name="~.*Agreement"/>
+            <Class name="~.*Customer"/>
+            <Class name="~.*PaymentRecord"/>
+            <Class name="~.*BankDetails"/>
+            <Class name="~.*Document"/>
+            <Class name="~.*AuditEvent"/>
+            <Class name="~.*SettlementFigure"/>
+            <Class name="~.*StatementRequest"/>
+        </Or>
+    </Match>
+
+    <!-- Null checks handled by Spring Security / Spring Data -->
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+        <Or>
+            <Class name="~.*Config"/>
+            <Class name="~.*Repository"/>
+            <Class name="~.*Service"/>
+            <Class name="~.*Controller"/>
+        </Or>
+    </Match>
+
+    <!-- Serialization not needed for Spring beans -->
+    <Match>
+        <Bug pattern="SE_BAD_FIELD"/>
+    </Match>
+    <Match>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+
+    <!-- Unconfirmed casts - Spring handles type safety -->
+    <Match>
+        <Bug pattern="BC_UNCONFIRMED_CAST"/>
+        <Or>
+            <Class name="~.*Controller"/>
+            <Class name="~.*Service"/>
+        </Or>
+    </Match>
+
+    <!-- Spring CGLIB proxies -->
+    <Match>
+        <Class name="~.*\$\$SpringCGLIB\$\$.*"/>
+    </Match>
+</FindBugsFilter>
