@@ -44,7 +44,7 @@ card payments, GraalVM native-image for fast cold starts. Deployed to Cloud Run 
 | `/my-contact-details`          | ContactController     | Inline-editable address, phone, email       |
 | `/finance/make-a-payment`      | PaymentController     | Stripe Elements card payment                |
 | `/finance/settlement-figure`   | SettlementController  | Settlement quote + SMS delivery             |
-| `/finance/change-payment-date` | StatementController   | DD date change request                      |
+| `/finance/change-payment-date` | PaymentDateController | DD date change (one per agreement lifetime) |
 | `/finance/request-a-statement` | StatementController   | Statement request                           |
 | `/finance/update-bank-details` | BankDetailsController | Encrypted bank detail update                |
 | `/help/faqs`                   | HelpController        | FAQ accordion                               |
@@ -157,8 +157,11 @@ Open **http://localhost:8080**. Login with any seeded customer (e.g. DOB `15/3/1
 
 - **Thymeleaf** renders HTML at `:8080`, referencing CSS/JS from Vite at `:5173`
 - **Vite HMR**: edit a `.css` file and changes appear instantly (no page reload)
-- **DevTools**: edit a `.html` template or `.java` file and Spring auto-restarts (~1-2s)
+- **Thymeleaf live reload**: `thymeleaf.cache: false` in the dev profile means template edits in `src/main/resources/templates/` are visible on browser refresh — no restart needed
+- **DevTools**: edit a `.java` file and Spring auto-restarts via classloader swap (~1-2s)
 - **No mock server**: Thymeleaf is the single template engine. No Nunjucks duplication.
+
+> **Important**: always use `dev` (which runs `spring-boot:run`) for local development, not `java -jar target/*.jar`. The JAR bundles templates at build time, so edits to `.html` files won't be reflected. `spring-boot:run` serves templates directly from `src/main/resources/templates/` on disk.
 
 ### Seed Data (for frontend developers)
 
@@ -228,7 +231,7 @@ cd frontend && npm run build
 ### Test
 
 ```bash
-# Unit tests (73 tests)
+# Unit tests (112 tests — includes @WebMvcTest template smoke tests)
 ./mvnw test -P no-checks
 
 # All tests including integration (requires Docker for Firestore)

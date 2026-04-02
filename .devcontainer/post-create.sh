@@ -58,6 +58,10 @@ alias test-all="cd /workspace && ./mvnw verify -P no-checks"
 alias build-jar="cd /workspace && ./mvnw package -P no-checks,frontend -DskipTests"
 alias lint="cd /workspace/frontend && npm run lint && npm run format:check"
 
+# Visual comparison (reference static site + Playwright)
+alias dev-static="cd /workspace/azadi-static-frontend/static-site && python3 -m http.server 3001"
+alias compare="cd /workspace && npx playwright test e2e/compare-pages.spec.js --reporter=line"
+
 # Docker
 alias dc='docker compose'
 alias dcup='docker compose up -d'
@@ -82,14 +86,19 @@ echo ""
 echo "Quick start:"
 echo "  fb-emulator      -> Start Firestore emulator (:8081)"
 echo "  dev-frontend     -> Start Vite dev server (:5173)"
-echo "  dev              -> Start Spring Boot (:8080)"
-echo "  test-unit        -> Run unit tests"
+echo "  dev              -> Start Spring Boot (:8080) — live template reload"
+echo "  test-unit        -> Run unit tests (112 tests)"
 echo "  test-all         -> Run all tests (unit + integration)"
 echo "  build-jar        -> Build production JAR"
+echo "  dev-static       -> Serve reference static site (:3001)"
+echo "  compare          -> Run Playwright visual comparison"
 echo ""
 echo "Workflow: Open 3 terminals:"
 echo "  1. fb-emulator     (Firestore)"
 echo "  2. dev-frontend    (Vite HMR on :5173)"
 echo "  3. dev             (Spring Boot on :8080)"
 echo "  -> Open http://localhost:8080"
+echo ""
+echo "NOTE: Always use 'dev' (spring-boot:run) not 'java -jar' for development."
+echo "      The JAR bundles templates at build time — edits won't be reflected."
 echo ""
