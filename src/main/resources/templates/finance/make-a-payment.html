@@ -22,7 +22,19 @@
   </div>
 
   <form th:action="@{/finance/make-a-payment}" method="post" id="payment-form"
-        th:attr="data-stripe-key=${stripePublicKey}" class="u-margin-bottom-normal">
+        th:attr="data-stripe-key=${stripePublishableKey}" class="u-margin-bottom-normal">
+
+    <!-- Agreement Selection -->
+    <div th:if="${agreements != null and !agreements.empty}" class="c-panel c-panel--header">
+      <div class="c-panel__inner">
+        <div class="c-form__field c-form__field--none">
+          <label for="agreementId" class="c-form__label">Agreement</label>
+          <select name="agreementId" id="agreementId" class="c-select" required>
+            <option th:each="agr : ${agreements}" th:value="${agr.id}" th:text="${agr.agreementNumber}"></option>
+          </select>
+        </div>
+      </div>
+    </div>
 
     <!-- Payment Amount -->
     <div class="c-panel c-panel--header">
@@ -66,35 +78,7 @@
   </form>
 
   <!-- Help section -->
-  <details class="c-accordion c-accordion--section" open>
-    <summary class="c-accordion__summary">
-      <span class="c-accordion__label">Help</span>
-      
-    </summary>
-    <div class="c-accordion__panel">
-      <div>
-        Call Customer Services on:<br>
-        <strong style="font-size: var(--font-size-2xl);">0344 824 4732</strong>
-      </div>
-      <div class="u-margin-top">
-        Lines are open:<br>
-        <div class="c-table c-table--auto c-table--normal">
-          <div class="c-table__row">
-            <div class="c-table__column c-table__column--condense"><strong>Monday to Friday</strong></div>
-            <div class="c-table__column">8:30am - 6:00pm (excluding UK Bank Holidays)</div>
-          </div>
-          <div class="c-table__row">
-            <div class="c-table__column c-table__column--condense"><strong>Saturday</strong></div>
-            <div class="c-table__column">9:00am - 1:00pm</div>
-          </div>
-        </div>
-      </div>
-      <p class="u-margin-top">Calls will cost no more than a UK national rate call to 01 or 02 telephone numbers and
-        will also count towards inclusive UK call minutes provided in telephone and mobile phone contracts.</p>
-      <p>For customers who are hard of hearing or have speech difficulties, you can contact us using the
-        Text Relay (NGT) Service.</p>
-    </div>
-  </details>
+  <th:block th:replace="~{fragments/help-panel :: help-panel}" />
 
 </div>
 </body>

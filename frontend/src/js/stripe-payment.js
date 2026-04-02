@@ -9,14 +9,12 @@ export function initStripePayment() {
 
   if (!cardContainer || !paymentForm) return;
 
-  // Read the publishable key from a data attribute on the form
   const publishableKey = paymentForm.dataset.stripeKey;
   if (!publishableKey) {
     console.warn('Stripe publishable key not found on #payment-form[data-stripe-key]');
     return;
   }
 
-  // Stripe.js should already be loaded from the CDN in the template
   if (typeof Stripe === 'undefined') {
     console.warn('Stripe.js not loaded. Ensure the script is included in the page.');
     return;
@@ -24,95 +22,88 @@ export function initStripePayment() {
 
   const stripe = Stripe(publishableKey); // eslint-disable-line no-undef
   const elements = stripe.elements();
+  const errorDisplay = document.getElementById('card-errors');
+  const submitButton = paymentForm.querySelector('[type="submit"]');
 
-  const style = {
-    base: {
-      color: '#282828',
-      fontFamily: "'Poppins', Arial, sans-serif",
-      fontSize: '14px',
-      '::placeholder': {
-        color: '#afb4b7',
+  const cardElement = elements.create('card', {
+    style: {
+      base: {
+        color: '#282828',
+        fontFamily: "'Poppins', Arial, sans-serif",
+        fontSize: '14px',
+        '::placeholder': { color: '#afb4b7' },
+      },
+      invalid: {
+        color: '#e4042b',
+        iconColor: '#e4042b',
       },
     },
-    invalid: {
-      color: '#e4042b',
-      iconColor: '#e4042b',
-    },
-  };
-
-  const cardElement = elements.create('card', { style });
+  });
   cardElement.mount('#card-element');
 
-  // Display validation errors
-  const errorDisplay = document.getElementById('card-errors');
   cardElement.on('change', (event) => {
-    if (errorDisplay) {
-      errorDisplay.textContent = event.error ? event.error.message : '';
-    }
+    showError(event.error ? event.error.message : '');
   });
 
-  // Handle form submission
+  function showError(message) {
+    if (errorDisplay) errorDisplay.textContent = message;
+  }
+
+  function setSubmitting(busy) {
+    if (!submitButton) return;
+    submitButton.disabled = busy;
+    submitButton.textContent = busy ? 'Processing...' : 'Pay';
+  }
+
+  function handleFailure(message) {
+    showError(message);
+    setSubmitting(false);
+  }
+
   paymentForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-
-    const submitButton = paymentForm.querySelector('[type="submit"]');
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = 'Processing...';
-    }
+    setSubmitting(true);
 
     try {
-      const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-      });
-
-      if (error) {
-        if (errorDisplay) {
-          errorDisplay.textContent = error.message;
-        }
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.textContent = 'Pay';
-        }
-        return;
-      }
-
-      // Post the payment method ID to the server
       const amountInput = paymentForm.querySelector('[name="amount"]');
+      const agreementSelect = paymentForm.querySelector('[name="agreementId"]');
       const csrfInput = paymentForm.querySelector('[name="_csrf"]');
+      const csrfToken = csrfInput?.value ?? '';
 
-      const formData = new FormData();
-      formData.append('paymentMethodId', paymentMethod.id);
-      if (amountInput) formData.append('amount', amountInput.value);
-      if (csrfInput) formData.append('_csrf', csrfInput.value);
+      const amountPence = Math.round(parseFloat(amountInput.value) * 100);
+      if (isNaN(amountPence) || amountPence < 100) {
+        return handleFailure('Please enter a valid amount (minimum \u00a31.00).');
+      }
 
       const response = await fetch(paymentForm.action, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken,
+        },
+        body: JSON.stringify({
+          amountPence,
+          agreementId: agreementSelect ? parseInt(agreementSelect.value, 10) : null,
+        }),
       });
 
       const result = await response.json();
 
-      if (result.success) {
-        window.location.href = result.redirectUrl || '/finance/make-a-payment?success=true';
-      } else {
-        if (errorDisplay) {
-          errorDisplay.textContent = result.message || 'Payment failed. Please try again.';
-        }
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.textContent = 'Pay';
-        }
+      if (result.error) {
+        return handleFailure(result.error);
       }
-    } catch (err) {
-      if (errorDisplay) {
-        errorDisplay.textContent = 'An unexpected error occurred. Please try again.';
+
+      const { error } = await stripe.confirmCardPayment(result.clientSecret, {
+        payment_method: { card: cardElement },
+      });
+
+      if (error) {
+        return handleFailure(error.message);
       }
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Pay';
-      }
+
+      window.location.href = '/finance/make-a-payment?success=true';
+    } catch {
+      handleFailure('An unexpected error occurred. Please try again.');
     }
   });
 }
