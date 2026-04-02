@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class SettlementController {
@@ -37,13 +38,22 @@ public class SettlementController {
         return "finance/settlement-figure";
     }
 
-    @PostMapping("/finance/settlement-figure")
+    @PostMapping(value = "/finance/settlement-figure", params = "agreementId")
     public String calculateSettlement(@RequestParam Long agreementId, Model model) {
         var customerId = authorizationService.getCurrentCustomerId();
-        var figure = settlementService.calculateSettlement(customerId, agreementId);
-        model.addAttribute("settlement", SettlementResponse.from(figure));
         var agreements = agreementService.getAgreementsForCustomer(customerId);
         model.addAttribute("agreements", agreements);
+
+        var figure = settlementService.calculateSettlement(customerId, agreementId);
+        model.addAttribute("settlement", SettlementResponse.from(figure));
         return "finance/settlement-figure";
+    }
+
+    @PostMapping(value = "/finance/settlement-figure", params = "mobileNumber")
+    public String sendSettlementSms(@RequestParam String mobileNumber,
+                                    RedirectAttributes redirectAttributes) {
+        // SMS sending would be implemented here
+        redirectAttributes.addFlashAttribute("smsSent", true);
+        return "redirect:/finance/settlement-figure";
     }
 }
