@@ -35,6 +35,7 @@ public class SecurityConfig {
             .authenticationProvider(azadiAuthenticationProvider)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/login-error", "/assets/**",
+                    "/cookies", "/privacy", "/terms",
                     "/actuator/health", "/api/stripe/webhook", "/api/csp-report").permitAll()
                 .anyRequest().authenticated()
             )

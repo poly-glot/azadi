@@ -40,3 +40,4 @@
 @import './utilities/_width.css' layer(utilities);
 @import './utilities/_visibility.css' layer(utilities);
 @import './utilities/_text.css' layer(utilities);
+@import './utilities/_layout-helpers.css' layer(utilities);

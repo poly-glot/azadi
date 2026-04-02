@@ -12,6 +12,8 @@
 .u-margin-top-normal { margin-block-start: var(--spacing-medium) !important; }
 .u-margin-vertical { margin-block: var(--spacing-medium) !important; }
 
+.u-margin-top-tiny { margin-block-start: var(--spacing-tiny) !important; }
+
 .u-padding { padding: var(--spacing-medium) !important; }
 .u-padding-none { padding: 0 !important; }
 .u-padding-vertical { padding-block: var(--spacing-medium) !important; }

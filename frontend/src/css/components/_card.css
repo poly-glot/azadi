@@ -36,3 +36,16 @@
 .c-panel--hero h1 {
   color: var(--color-white);
 }
+
+.c-panel__amount {
+  font-size: var(--font-size-3xl);
+  font-weight: 400;
+  margin-block-end: var(--spacing-small);
+}
+
+/* Title divider bar (agreement number) */
+.c-panel__divider {
+  border-block-end: 2px solid var(--border-color);
+  padding-block-end: var(--spacing-small);
+  margin-block-end: var(--spacing-medium);
+}

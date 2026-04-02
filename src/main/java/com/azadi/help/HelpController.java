@@ -2,24 +2,37 @@ package com.azadi.help;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/help")
 public class HelpController {
 
-    @GetMapping("/faqs")
+    @GetMapping("/help/faqs")
     public String faqs() {
         return "help/faqs";
     }
 
-    @GetMapping("/ways-to-pay")
+    @GetMapping("/help/ways-to-pay")
     public String waysToPay() {
         return "help/ways-to-pay";
     }
 
-    @GetMapping("/contact-us")
+    @GetMapping("/help/contact-us")
     public String contactUs() {
         return "help/contact-us";
+    }
+
+    @GetMapping("/cookies")
+    public String cookies() {
+        return "legal/cookies";
+    }
+
+    @GetMapping("/privacy")
+    public String privacy() {
+        return "legal/privacy";
+    }
+
+    @GetMapping("/terms")
+    public String terms() {
+        return "legal/terms";
     }
 }

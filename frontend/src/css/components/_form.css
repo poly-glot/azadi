@@ -137,6 +137,13 @@
   padding-inline-start: 2rem;
 }
 
+/* Stripe Elements card mount */
+.c-stripe-card {
+  padding: var(--spacing-small);
+  border: 1px solid var(--color-gray-400);
+  border-radius: var(--radius);
+}
+
 /* Checkbox / Radio */
 .c-option {
   display: flex;
@@ -178,4 +185,10 @@
 /* Form actions */
 .c-form__actions {
   padding-block-start: var(--spacing-small);
+}
+
+.c-form__actions--inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

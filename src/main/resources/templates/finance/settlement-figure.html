@@ -11,7 +11,7 @@
 
   <h1 class="u-site-heading">Settlement Figure</h1>
 
-  <div th:if="${settlement != null}" style="border-block-end: 2px solid var(--border-color); padding-block-end: var(--spacing-small); margin-block-end: var(--spacing-medium);">
+  <div th:if="${settlement != null}" class="c-panel__divider">
     <p class="u-h5 u-margin-bottom-none">
       <strong>Agreement number: </strong>
       <span th:text="${settlement.agreementId ?: ''}">12345 58936 54894</span>
@@ -51,15 +51,14 @@
   <!-- Settlement hero -->
   <div th:if="${settlement != null}" class="c-panel c-panel--hero u-margin-bottom-normal">
     <div class="c-panel__inner">
-      <p style="font-size: var(--font-size-3xl); font-weight: 400; margin-block-end: var(--spacing-small);"
-         th:text="${settlement.amount ?: ''}">&#163;29,367.67</p>
+      <p class="c-panel__amount" th:text="${settlement.amount ?: ''}">&#163;29,367.67</p>
       <p>
         <strong class="u-prominent">Settlement expires on:</strong>
         <span th:text="${settlement.validUntil ?: ''}">15/12/2025</span>
       </p>
-      <div style="display: flex; gap: var(--spacing-small); justify-content: center; flex-wrap: wrap;">
-        <a th:href="@{/finance/make-a-payment}" class="c-button c-button--cta" style="background: #fff; color: var(--color-primary); border-color: #fff;">Settle Now</a>
-        <a th:href="@{/help/ways-to-pay}" class="c-button c-button--cta c-button--secondary" style="color: #fff; border-color: #fff;">Ways to Pay</a>
+      <div class="u-button-group u-button-group--center">
+        <a th:href="@{/finance/make-a-payment}" class="c-button c-button--cta c-button--inverse">Settle Now</a>
+        <a th:href="@{/help/ways-to-pay}" class="c-button c-button--cta c-button--secondary c-button--inverse">Ways to Pay</a>
       </div>
     </div>
   </div>
@@ -77,24 +76,26 @@
       <span class="c-accordion__label">Settlement Figure By Text</span>
       
     </summary>
-    <div class="c-accordion__panel">
-      <p class="u-note">
-        To receive a copy of this settlement figure via text message please enter your mobile number.<br>
-        We will not charge you for this service.
-      </p>
+    <div class="c-accordion__panel c-accordion__panel--shadow">
+      <div class="c-accordion__content">
+        <p class="u-note">
+          To receive a copy of this settlement figure via text message please enter your mobile number.<br>
+          We will not charge you for this service.
+        </p>
 
-      <form th:action="@{/finance/settlement-figure}" method="post" class="u-margin-top-normal">
-        <div class="c-form__field c-form__field--none">
-          <label for="mobile" class="c-form__label u-small">
-            Mobile Number<span class="u-color-default">*</span>
-          </label>
-          <div class="c-input-group">
-            <input type="tel" name="mobileNumber" id="mobile" class="c-input"
-                   placeholder="Mobile number" required>
-            <button type="submit" class="c-button">Send</button>
+        <form th:action="@{/finance/settlement-figure}" method="post" class="u-margin-top-normal">
+          <div class="c-form__field c-form__field--none">
+            <label for="mobile" class="c-form__label u-small">
+              Mobile Number<span class="u-color-default">*</span>
+            </label>
+            <div class="c-input-group">
+              <input type="tel" name="mobileNumber" id="mobile" class="c-input"
+                     placeholder="Mobile number" required>
+              <button type="submit" class="c-button">Send</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </details>
 

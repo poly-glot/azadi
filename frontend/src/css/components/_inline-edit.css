@@ -71,9 +71,19 @@
   outline-offset: 2px;
 }
 
+.c-inline-edit__field-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.c-inline-edit__field-group .c-input {
+  width: 100%;
+}
+
 .c-inline-edit__actions {
   display: flex;
   gap: var(--spacing-tiny);
+  align-self: flex-end;
 }
 
 .c-inline-edit__status {

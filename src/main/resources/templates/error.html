@@ -9,11 +9,11 @@
 <body>
 <div layout:fragment="content-public">
 
-  <div class="o-band o-band--fullscreen" style="background-color: var(--color-gray-100);">
+  <div class="o-band o-band--fullscreen o-band--gray">
     <div class="o-wrapper">
-      <div class="c-dialog" style="max-width: 36rem; text-align: center;">
+      <div class="c-dialog c-dialog--error">
         <div class="c-dialog__inner">
-          <h1 style="font-size: var(--font-size-3xl); color: var(--color-error);"
+          <h1 class="u-text-3xl u-color-error"
               th:text="${status ?: '500'}">500</h1>
           <h2 class="c-dialog__heading u-margin-bottom-small">
             <span th:text="${error ?: 'Something went wrong'}">Something went wrong</span>
@@ -33,7 +33,7 @@
 
 <!-- Also handle authenticated error pages -->
 <div layout:fragment="content">
-  <h1 class="u-condense" style="font-size: var(--font-size-2xl);">Error</h1>
+  <h1 class="u-condense u-text-2xl">Error</h1>
   <div class="c-alert c-alert--danger">
     <p><strong>Error <span th:text="${status}">500</span>:</strong>
       <span th:text="${error ?: 'Something went wrong'}">Something went wrong</span></p>

@@ -44,7 +44,6 @@
           <div class="c-input-placeholder">
             <div class="c-input-placeholder__icon">£</div>
             <input type="text" name="amount" id="amount" class="c-input"
-                   style="padding-inline-start: 2rem;"
                    placeholder="500"
                    th:value="${amount}"
                    inputmode="decimal"
@@ -63,8 +62,7 @@
       <div class="c-panel__inner">
         <div class="c-form__field">
           <label class="c-form__label">Card Details</label>
-          <div id="card-element"
-               style="padding: var(--spacing-small); border: 1px solid var(--color-gray-400); border-radius: var(--radius);">
+          <div id="card-element" class="c-stripe-card">
             <!-- Stripe Elements will mount here -->
           </div>
           <div id="card-errors" class="c-field-error" role="alert"></div>

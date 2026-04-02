@@ -70,6 +70,19 @@
   font-size: var(--font-size-xs);
 }
 
+/* White button on dark backgrounds (settlement hero) */
+.c-button--inverse {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  border-color: var(--color-white);
+}
+
+.c-button--inverse.c-button--secondary {
+  background-color: transparent;
+  color: var(--color-white);
+  border-color: var(--color-white);
+}
+
 .c-button + .c-button {
   margin-inline-start: var(--spacing-small);
 }
