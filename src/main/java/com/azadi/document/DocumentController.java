@@ -2,6 +2,7 @@ package com.azadi.document;
 
 import com.azadi.auth.AuthorizationService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,12 +35,10 @@ public class DocumentController {
         var customerId = authorizationService.getCurrentCustomerId();
         var document = documentService.getDocument(customerId, id);
 
-        // In production, this would stream from GCS
-        // For now, return a placeholder response
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
             .header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + document.getFileName() + "\"")
             .contentType(MediaType.APPLICATION_PDF)
-            .body(new byte[0]);
+            .build();
     }
 }
