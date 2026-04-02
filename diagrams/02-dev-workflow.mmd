@@ -1,0 +1,11 @@
+%%{init: {'theme': 'base', 'look': 'classic', 'flowchart': {'defaultRenderer': 'elk', 'curve': 'linear', 'padding': 20, 'nodeSpacing': 60, 'rankSpacing': 50}, 'elk': {'mergeEdges': true, 'nodePlacementStrategy': 'SIMPLE'}, 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'fontFamily': 'Arial', 'fontSize': '14px'}, 'themeCSS': '.edgePath .path { stroke-width: 2px !important; } .flowchart-link { stroke-width: 2px !important; }'}}%%
+
+flowchart TB
+    Browser["Browser\nlocalhost:8080"] -->|"page request"| SB["Spring Boot :8080\nThymeleaf + DevTools"]
+    SB -->|"reads data"| FS["Firestore Emulator :8081\nDocker Compose"]
+    SB -->|"asset tags"| Vite["Vite :5173\nCSS + JS + HMR"]
+
+    style Browser fill:#fff,stroke:#000,stroke-width:2px,color:#000
+    style SB fill:#fff,stroke:#000,stroke-width:3px,color:#000
+    style FS fill:#f5f5f5,stroke:#000,stroke-width:2px,color:#000
+    style Vite fill:#f5f5f5,stroke:#000,stroke-width:2px,color:#000

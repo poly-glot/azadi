@@ -10,26 +10,21 @@
   height: 45px;
   padding-inline: var(--spacing-medium);
   font-family: var(--font-family);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
   text-decoration: none;
-  letter-spacing: 0.05em;
   color: var(--color-white);
   background-color: var(--color-primary);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius);
   cursor: pointer;
-  transition:
-    background-color var(--transition),
-    color var(--transition),
-    border-color var(--transition);
+  transition: color 0.4s, background-color 0.4s;
 }
 
 .c-button:hover {
-  background-color: var(--color-gray-700);
-  border-color: var(--color-gray-700);
-  color: var(--color-white);
+  background-color: var(--color-white);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .c-button:focus-visible {
@@ -42,8 +37,9 @@
 }
 
 .c-button--secondary {
-  background-color: transparent;
-  color: var(--color-primary);
+  background-color: var(--color-white);
+  border: 1px solid #000;
+  color: #000;
 }
 
 .c-button--secondary:hover {

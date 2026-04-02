@@ -4,11 +4,11 @@
    ========================================================================== */
 
 .o-band {
-  padding-block: var(--spacing-large);
+  padding: 63px 0;
 }
 
 .o-band--md {
-  padding-block: var(--spacing-medium);
+  padding: 42px 0;
   flex: 1;
 }
 

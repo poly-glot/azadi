@@ -7,186 +7,120 @@ import com.azadi.bank.BankDetailsEncryptor;
 import com.azadi.document.Document;
 import com.azadi.payment.PaymentRecord;
 import com.azadi.settlement.SettlementFigure;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.spring.data.datastore.core.DatastoreTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Seeds the Firestore emulator with test data on startup.
+ *
+ * <p>Data is read from {@code src/main/resources/seed/customers.json} --
+ * a plain JSON file that frontend developers can edit without touching Java.
+ * Add a customer, change a name, adjust a balance: edit the JSON, restart
+ * Spring Boot, and the emulator is re-populated.</p>
+ *
+ * <p>Only runs when the {@code dev} profile is active. Skips seeding if
+ * a {@link SeedMarker} entity already exists (delete the emulator data
+ * or restart Docker to re-seed).</p>
+ */
 @Component
 @Profile("dev")
 public class DataSeeder implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataSeeder.class);
+    private static final String SEED_FILE = "seed/customers.json";
 
     private final DatastoreTemplate datastoreTemplate;
     private final BankDetailsEncryptor encryptor;
+    private final ObjectMapper objectMapper;
 
-    public DataSeeder(DatastoreTemplate datastoreTemplate, BankDetailsEncryptor encryptor) {
+    public DataSeeder(DatastoreTemplate datastoreTemplate,
+                      BankDetailsEncryptor encryptor,
+                      ObjectMapper objectMapper) {
         this.datastoreTemplate = datastoreTemplate;
         this.encryptor = encryptor;
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public void run(String... args) {
-        var existing = datastoreTemplate.findAll(SeedMarker.class);
-        if (existing.iterator().hasNext()) {
-            LOG.info("Seed data already exists, skipping.");
+    public void run(String... args) throws Exception {
+        if (datastoreTemplate.findAll(SeedMarker.class).iterator().hasNext()) {
+            LOG.info("Seed data already exists, skipping. "
+                + "To re-seed: docker compose down && docker compose up -d, then restart Spring Boot.");
             return;
         }
 
-        LOG.info("Seeding development data...");
+        LOG.info("Reading seed data from {}...", SEED_FILE);
+        var resource = new ClassPathResource(SEED_FILE);
+        List<JsonNode> customers = objectMapper.readValue(
+            resource.getInputStream(), new TypeReference<>() {});
 
-        seedCustomer1();
-        seedCustomer2();
-        seedCustomer3();
-        seedCustomer4();
-        seedCustomer5();
+        for (var node : customers) {
+            seedCustomer(node);
+        }
 
         var marker = new SeedMarker();
         marker.setSeededAt(Instant.now());
         datastoreTemplate.save(marker);
 
-        LOG.info("Seed data created successfully.");
+        LOG.info("Seeded {} customers from {}.", customers.size(), SEED_FILE);
     }
 
-    private void seedCustomer1() {
-        createCustomer("CUST-001", "James Wilson", "james.wilson@email.com",
-            LocalDate.of(1985, 3, 15), "SW1A 1AA", "07700 900001",
-            "10 Downing Street", null, "London");
+    private void seedCustomer(JsonNode node) {
+        var customerId = node.get("customerId").asText();
 
-        var agreement = createAgreement("AGR-100001", "CUST-001", "PCP",
-            6_499_960L, new BigDecimal("10.0"), 49, 40_000, 15L,
-            "AZADI SUMMIT V8 TOURING", "AB68 ABC",
-            132_652L, LocalDate.now().minusMonths(1),
-            132_652L, LocalDate.now().plusDays(14), 37,
-            LocalDate.now().plusMonths(37));
-
-        seedPaymentHistory("CUST-001", agreement.getId());
-        seedDocuments("CUST-001");
-        seedSettlement("CUST-001", agreement.getId(), 6_499_960L);
-        seedBankDetails("CUST-001", "James Wilson", "12345678", "20-30-40");
-    }
-
-    private void seedCustomer2() {
-        createCustomer("CUST-002", "Sarah Thompson", "sarah.thompson@email.com",
-            LocalDate.of(1990, 7, 22), "M1 1AE", "07700 900002",
-            "1 Piccadilly", "City Centre", "Manchester");
-
-        var agreement = createAgreement("AGR-100002", "CUST-002", "HP",
-            1_875_000L, new BigDecimal("8.5"), 36, 30_000, 12L,
-            "AZADI EXPLORER SPORT", "CD19 XYZ",
-            52_083L, LocalDate.now().minusMonths(1),
-            52_083L, LocalDate.now().plusDays(14), 24,
-            LocalDate.now().plusMonths(24));
-
-        seedPaymentHistory("CUST-002", agreement.getId());
-        seedDocuments("CUST-002");
-        seedSettlement("CUST-002", agreement.getId(), 1_875_000L);
-        seedBankDetails("CUST-002", "Sarah Thompson", "87654321", "10-20-30");
-    }
-
-    private void seedCustomer3() {
-        createCustomer("CUST-003", "David Patel", "david.patel@email.com",
-            LocalDate.of(1978, 11, 3), "B1 1BB", "07700 900003",
-            "1 Victoria Square", null, "Birmingham");
-
-        var agreement = createAgreement("AGR-100003", "CUST-003", "LEASE",
-            2_210_000L, new BigDecimal("6.9"), 48, 35_000, 10L,
-            "AZADI VANGUARD HSE", "EF20 DEF",
-            46_042L, LocalDate.now().minusMonths(1),
-            46_042L, LocalDate.now().plusDays(14), 36,
-            LocalDate.now().plusMonths(36));
-
-        seedPaymentHistory("CUST-003", agreement.getId());
-        seedDocuments("CUST-003");
-        seedSettlement("CUST-003", agreement.getId(), 2_210_000L);
-        seedBankDetails("CUST-003", "David Patel", "11223344", "40-50-60");
-    }
-
-    private void seedCustomer4() {
-        createCustomer("CUST-004", "Emma Roberts", "emma.roberts@email.com",
-            LocalDate.of(1992, 1, 28), "LS1 1BA", "07700 900004",
-            "1 City Square", null, "Leeds");
-
-        var agreement = createAgreement("AGR-100004", "CUST-004", "PCP",
-            1_420_000L, new BigDecimal("9.2"), 42, 25_000, 14L,
-            "AZADI PIONEER SE", "GH21 GHI",
-            33_810L, LocalDate.now().minusMonths(1),
-            33_810L, LocalDate.now().plusDays(14), 30,
-            LocalDate.now().plusMonths(30));
-
-        seedPaymentHistory("CUST-004", agreement.getId());
-        seedDocuments("CUST-004");
-        seedSettlement("CUST-004", agreement.getId(), 1_420_000L);
-        seedBankDetails("CUST-004", "Emma Roberts", "55667788", "60-70-80");
-    }
-
-    private void seedCustomer5() {
-        createCustomer("CUST-005", "Michael Chen", "michael.chen@email.com",
-            LocalDate.of(1988, 6, 10), "EH1 1YZ", "07700 900005",
-            "1 Princes Street", null, "Edinburgh");
-
-        var agreement = createAgreement("AGR-100005", "CUST-005", "HP",
-            1_680_000L, new BigDecimal("7.5"), 36, 20_000, 11L,
-            "AZADI MERIDIAN R-DYNAMIC", "IJ22 JKL",
-            46_667L, LocalDate.now().minusMonths(1),
-            46_667L, LocalDate.now().plusDays(14), 24,
-            LocalDate.now().plusMonths(24));
-
-        seedPaymentHistory("CUST-005", agreement.getId());
-        seedDocuments("CUST-005");
-        seedSettlement("CUST-005", agreement.getId(), 1_680_000L);
-        seedBankDetails("CUST-005", "Michael Chen", "99001122", "80-90-00");
-    }
-
-    private Customer createCustomer(String customerId, String fullName, String email,
-                                     LocalDate dob, String postcode, String phone,
-                                     String addressLine1, String addressLine2, String city) {
         var customer = new Customer();
         customer.setCustomerId(customerId);
-        customer.setFullName(fullName);
-        customer.setEmail(email);
-        customer.setDob(dob);
-        customer.setPostcode(postcode);
-        customer.setPhone(phone);
-        customer.setAddressLine1(addressLine1);
-        customer.setAddressLine2(addressLine2);
-        customer.setCity(city);
-        return datastoreTemplate.save(customer);
-    }
+        customer.setFullName(node.get("fullName").asText());
+        customer.setEmail(node.get("email").asText());
+        customer.setDob(LocalDate.parse(node.get("dob").asText()));
+        customer.setPostcode(node.get("postcode").asText());
+        customer.setPhone(node.get("phone").asText());
+        customer.setAddressLine1(node.get("addressLine1").asText());
+        customer.setAddressLine2(node.path("addressLine2").asText(null));
+        customer.setCity(node.get("city").asText());
+        datastoreTemplate.save(customer);
 
-    private Agreement createAgreement(String agreementNumber, String customerId, String type,
-                                       long balancePence, BigDecimal apr, int termMonths,
-                                       int contractMileage, long excessPricePence,
-                                       String vehicleModel, String registration,
-                                       long lastPaymentPence, LocalDate lastPaymentDate,
-                                       long nextPaymentPence, LocalDate nextPaymentDate,
-                                       int paymentsRemaining, LocalDate finalPaymentDate) {
+        var agr = node.get("agreement");
         var agreement = new Agreement();
-        agreement.setAgreementNumber(agreementNumber);
+        agreement.setAgreementNumber(agr.get("agreementNumber").asText());
         agreement.setCustomerId(customerId);
-        agreement.setType(type);
-        agreement.setBalancePence(balancePence);
-        agreement.setApr(apr);
-        agreement.setOriginalTermMonths(termMonths);
-        agreement.setContractMileage(contractMileage);
-        agreement.setExcessPricePerMilePence(excessPricePence);
-        agreement.setVehicleModel(vehicleModel);
-        agreement.setRegistration(registration);
-        agreement.setLastPaymentPence(lastPaymentPence);
-        agreement.setLastPaymentDate(lastPaymentDate);
-        agreement.setNextPaymentPence(nextPaymentPence);
-        agreement.setNextPaymentDate(nextPaymentDate);
-        agreement.setPaymentsRemaining(paymentsRemaining);
-        agreement.setFinalPaymentDate(finalPaymentDate);
-        return datastoreTemplate.save(agreement);
+        agreement.setType(agr.get("type").asText());
+        agreement.setBalancePence(agr.get("balancePence").asLong());
+        agreement.setApr(new BigDecimal(agr.get("apr").asText()));
+        agreement.setOriginalTermMonths(agr.get("termMonths").asInt());
+        agreement.setContractMileage(agr.get("contractMileage").asInt());
+        agreement.setExcessPricePerMilePence(agr.get("excessPricePerMilePence").asLong());
+        agreement.setVehicleModel(agr.get("vehicleModel").asText());
+        agreement.setRegistration(agr.get("registration").asText());
+        agreement.setLastPaymentPence(agr.get("monthlyPaymentPence").asLong());
+        agreement.setLastPaymentDate(LocalDate.now().minusMonths(1));
+        agreement.setNextPaymentPence(agr.get("monthlyPaymentPence").asLong());
+        agreement.setNextPaymentDate(LocalDate.now().plusDays(14));
+        agreement.setPaymentsRemaining(agr.get("paymentsRemaining").asInt());
+        agreement.setFinalPaymentDate(LocalDate.now().plusMonths(agr.get("paymentsRemaining").asInt()));
+        var savedAgreement = datastoreTemplate.save(agreement);
+
+        seedPaymentHistory(customerId, savedAgreement.getId());
+        seedDocuments(customerId, node.get("documents"));
+        seedSettlement(customerId, savedAgreement.getId(), agr.get("balancePence").asLong());
+
+        var bank = node.get("bankDetails");
+        seedBankDetails(customerId, node.get("fullName").asText(),
+            bank.get("accountNumber").asText(), bank.get("sortCode").asText());
     }
 
     private void seedPaymentHistory(String customerId, Long agreementId) {
@@ -205,27 +139,19 @@ public class DataSeeder implements CommandLineRunner {
         datastoreTemplate.saveAll(payments);
     }
 
-    private void seedDocuments(String customerId) {
-        var doc1 = new Document();
-        doc1.setCustomerId(customerId);
-        doc1.setTitle("Finance Agreement");
-        doc1.setFileName("finance-agreement.pdf");
-        doc1.setContentType("application/pdf");
-        doc1.setStoragePath("documents/" + customerId + "/finance-agreement.pdf");
-        doc1.setFileSizeBytes(245_000L);
-        doc1.setCreatedAt(Instant.now().minusSeconds(180L * 24 * 3600));
-
-        var doc2 = new Document();
-        doc2.setCustomerId(customerId);
-        doc2.setTitle("Welcome Pack");
-        doc2.setFileName("welcome-pack.pdf");
-        doc2.setContentType("application/pdf");
-        doc2.setStoragePath("documents/" + customerId + "/welcome-pack.pdf");
-        doc2.setFileSizeBytes(128_000L);
-        doc2.setCreatedAt(Instant.now().minusSeconds(180L * 24 * 3600));
-
-        datastoreTemplate.save(doc1);
-        datastoreTemplate.save(doc2);
+    private void seedDocuments(String customerId, JsonNode docsNode) {
+        if (docsNode == null || !docsNode.isArray()) return;
+        for (var docNode : docsNode) {
+            var doc = new Document();
+            doc.setCustomerId(customerId);
+            doc.setTitle(docNode.get("title").asText());
+            doc.setFileName(docNode.get("fileName").asText());
+            doc.setContentType(docNode.get("contentType").asText());
+            doc.setStoragePath("documents/" + customerId + "/" + docNode.get("fileName").asText());
+            doc.setFileSizeBytes(docNode.get("fileSizeBytes").asLong());
+            doc.setCreatedAt(Instant.now().minusSeconds(180L * 24 * 3600));
+            datastoreTemplate.save(doc);
+        }
     }
 
     private void seedSettlement(String customerId, Long agreementId, long balancePence) {

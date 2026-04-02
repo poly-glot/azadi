@@ -54,24 +54,22 @@
   flex: 1;
 }
 
-.c-accordion__indicator {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-  transition: transform var(--transition);
-}
-
-.c-accordion[open] > .c-accordion__summary .c-accordion__indicator {
-  transform: rotate(45deg);
-}
+/* Indicator removed — reference has no visible expand/collapse icons */
 
 .c-accordion__panel {
-  padding: var(--spacing-medium);
   border-block-start: 1px solid var(--border-color);
+}
+
+.c-accordion__panel--padded {
+  padding: var(--spacing-medium);
 }
 
 .c-accordion__panel--shadow {
   box-shadow: var(--shadow-sm) inset;
+}
+
+.c-accordion__content {
+  padding: 42px 21px;
 }
 
 /* Navigation accordion variant */
@@ -95,20 +93,28 @@
 
 /* Section accordion variant (my-account cards) */
 .c-accordion--section {
-  margin-block-end: var(--spacing-medium);
+  margin-block-end: 2.625rem;
+  border: 1px solid rgba(153, 153, 153, 0.5);
 }
 
 .c-accordion--section .c-accordion__summary {
-  background-color: var(--color-primary);
-  color: var(--color-white);
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  font-size: 1.125rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-block-end: 1px solid rgba(153, 153, 153, 0.5);
 }
 
 .c-accordion--section .c-accordion__summary:hover {
-  background-color: var(--color-gray-700);
+  background-color: var(--color-gray-100);
 }
 
 .c-accordion--section .c-accordion__panel {
-  box-shadow: var(--shadow-sm);
+  padding: 0;
+  border-block-start: none;
+  background-color: var(--color-white);
+  color: var(--color-primary);
 }
 
 /* FAQ variant */

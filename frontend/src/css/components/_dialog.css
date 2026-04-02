@@ -7,9 +7,8 @@
   width: 100%;
   max-width: 28rem;
   margin-inline: auto;
-  background-color: rgba(255, 255, 255, 0.96);
+  background-color: var(--color-white);
   border-radius: var(--radius);
-  backdrop-filter: blur(4px);
 }
 
 .c-dialog__inner {

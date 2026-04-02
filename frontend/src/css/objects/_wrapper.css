@@ -5,6 +5,7 @@
 
 .o-wrapper {
   max-width: var(--max-width);
-  margin-inline: auto;
-  padding-inline: var(--spacing-medium);
+  margin: 0 auto;
+  padding-left: 21px;
+  padding-right: 21px;
 }

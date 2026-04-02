@@ -14,7 +14,7 @@
 }
 
 .c-nav-item {
-  border-block-end: 1px solid var(--border-color);
+  margin-block-end: 0.9375rem;
 }
 
 /* Direct nav links (non-expandable items) */
@@ -22,18 +22,22 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-small);
-  padding: var(--spacing-small) var(--spacing-small);
+  padding: 0 var(--spacing-medium);
+  min-height: 3.75rem;
   text-decoration: none;
-  color: var(--color-text);
+  color: #000;
+  background-color: var(--color-white);
+  border: 1px solid #000;
+  font-family: var(--font-family);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  text-transform: capitalize;
-  transition: background-color var(--transition);
+  text-transform: uppercase;
+  transition: color 0.4s, background-color 0.4s;
 }
 
 .c-nav-link:hover {
-  background-color: var(--color-gray-100);
-  color: var(--color-text);
+  background-color: var(--color-primary);
+  color: var(--color-white);
 }
 
 .c-nav-link:focus-visible {
@@ -77,23 +81,27 @@
 .c-nav-details {
   border: none;
   margin: 0;
+  margin-block-end: 0.9375rem;
   border-radius: 0;
-  border-block-end: 1px solid var(--border-color);
 }
 
 .c-nav-details > summary {
   display: flex;
   align-items: center;
   gap: var(--spacing-small);
-  padding: var(--spacing-small);
+  padding: 0 var(--spacing-medium);
+  min-height: 3.75rem;
   text-decoration: none;
-  color: var(--color-text);
+  color: #000;
+  background-color: var(--color-white);
+  border: 1px solid #000;
+  font-family: var(--font-family);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  text-transform: capitalize;
+  text-transform: uppercase;
   cursor: pointer;
   list-style: none;
-  transition: background-color var(--transition);
+  transition: color 0.4s, background-color 0.4s;
 }
 
 .c-nav-details > summary::-webkit-details-marker {
@@ -105,7 +113,8 @@
 }
 
 .c-nav-details > summary:hover {
-  background-color: var(--color-gray-100);
+  background-color: var(--color-primary);
+  color: var(--color-white);
 }
 
 .c-nav-details > summary:focus-visible {
@@ -113,41 +122,36 @@
   outline-offset: -2px;
 }
 
-.c-nav-details__indicator {
-  width: 0.75rem;
-  height: 0.75rem;
-  flex-shrink: 0;
-  transition: transform var(--transition);
-}
-
-.c-nav-details[open] > summary .c-nav-details__indicator {
-  transform: rotate(45deg);
-}
+/* Indicator removed — reference has no visible expand icons */
 
 /* Sub-items */
 .c-nav-sub {
   list-style: none;
   padding: 0;
   margin: 0;
-  background-color: var(--color-gray-100);
 }
 
 .c-nav-sub__link {
   display: flex;
   align-items: center;
   gap: var(--spacing-small);
-  padding: var(--spacing-small) var(--spacing-small) var(--spacing-small) calc(var(--spacing-medium) + 1.25rem);
+  padding: 0 var(--spacing-medium);
+  min-height: 3.75rem;
   text-decoration: none;
-  color: var(--color-text);
-  font-size: var(--font-size-xs);
-  text-transform: capitalize;
-  transition: background-color var(--transition);
-  border-block-start: 1px solid var(--border-color);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-500);
+  border-block-start: none;
+  color: var(--color-gray-700);
+  font-family: var(--font-family);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  transition: color 0.4s, background-color 0.4s;
 }
 
 .c-nav-sub__link:hover {
-  background-color: var(--color-gray-200);
-  color: var(--color-text);
+  background-color: var(--color-primary);
+  color: var(--color-white);
 }
 
 .c-nav-sub__link--active {

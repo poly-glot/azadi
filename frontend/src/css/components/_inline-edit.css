@@ -33,6 +33,9 @@
 
 .c-inline-edit.is-editing .c-inline-edit__fields {
   display: flex;
+  background-color: #e3e4e6;
+  padding: var(--spacing-small) var(--spacing-medium);
+  margin: calc(-1 * var(--spacing-small)) calc(-1 * var(--spacing-medium));
 }
 
 .c-inline-edit__label {

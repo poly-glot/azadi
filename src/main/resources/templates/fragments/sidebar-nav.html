@@ -9,7 +9,6 @@
        th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/my-account')} ? 'c-nav-link--active' : ''"
        class="c-nav-link">
       <span class="c-nav-link__label">My Account</span>
-      <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
     </a>
   </div>
 
@@ -22,7 +21,6 @@
         <span th:if="${unreadDocuments != null and unreadDocuments > 0}"
               th:text="'(' + ${unreadDocuments} + ') '"></span>My Documents
       </span>
-      <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
     </a>
   </div>
 
@@ -31,33 +29,27 @@
            th:open="${#strings.contains(#httpServletRequest.requestURI, '/finance/')}">
     <summary>
       <span class="c-nav-link__label">Manage My Finance</span>
-      <span class="c-nav-details__indicator" aria-hidden="true">+</span>
     </summary>
     <div class="c-nav-sub">
       <a th:href="@{/finance/make-a-payment}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/make-a-payment')} ? 'c-nav-sub__link--active' : ''">
-        <span>Make a Payment</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        Make a Payment
       </a>
       <a th:href="@{/finance/change-payment-date}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/change-payment-date')} ? 'c-nav-sub__link--active' : ''">
-        <span>Change Payment Date</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        Change Payment Date
       </a>
       <a th:href="@{/finance/settlement-figure}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/settlement-figure')} ? 'c-nav-sub__link--active' : ''">
-        <span>Settlement Figure</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        Settlement Figure
       </a>
       <a th:href="@{/finance/request-a-statement}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/request-a-statement')} ? 'c-nav-sub__link--active' : ''">
-        <span>Request a Statement</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        Request a Statement
       </a>
       <a th:href="@{/finance/update-bank-details}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/update-bank-details')} ? 'c-nav-sub__link--active' : ''">
-        <span>Update Bank Details</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        Update Bank Details
       </a>
     </div>
   </details>
@@ -68,7 +60,6 @@
        th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/my-contact-details')} ? 'c-nav-link--active' : ''"
        class="c-nav-link">
       <span class="c-nav-link__label">My Contact Details</span>
-      <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
     </a>
   </div>
 
@@ -77,23 +68,19 @@
            th:open="${#strings.contains(#httpServletRequest.requestURI, '/help/')}">
     <summary>
       <span class="c-nav-link__label">Help</span>
-      <span class="c-nav-details__indicator" aria-hidden="true">+</span>
     </summary>
     <div class="c-nav-sub">
       <a th:href="@{/help/faqs}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/faqs')} ? 'c-nav-sub__link--active' : ''">
-        <span>FAQs</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        FAQs
       </a>
       <a th:href="@{/help/ways-to-pay}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/ways-to-pay')} ? 'c-nav-sub__link--active' : ''">
-        <span>Ways to Pay</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        Ways to Pay
       </a>
       <a th:href="@{/help/contact-us}" class="c-nav-sub__link"
          th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/contact-us')} ? 'c-nav-sub__link--active' : ''">
-        <span>Contact Us</span>
-        <span class="c-nav-link__arrow" aria-hidden="true">&rsaquo;</span>
+        Contact Us
       </a>
     </div>
   </details>

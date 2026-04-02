@@ -6,11 +6,11 @@
 .o-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--spacing-medium);
+  gap: 21px;
 }
 
 .o-layout--medium {
-  gap: var(--spacing-large);
+  gap: 42px;
 }
 
 .o-layout--sidebar {
@@ -19,7 +19,8 @@
 
 @media (min-width: 64rem) {
   .o-layout--sidebar {
-    grid-template-columns: var(--sidebar-width) var(--content-width);
+    grid-template-columns: 318px 1fr;
+    gap: 42px;
   }
 }
 

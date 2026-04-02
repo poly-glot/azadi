@@ -19,7 +19,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" th:attr="nonce=${cspNonce}">
 
-  <link rel="stylesheet" th:href="@{/assets/css/main.css}" th:attr="nonce=${cspNonce}">
+  <!--/* Dev mode: Vite HMR client + source CSS/JS */-->
+  <th:block th:if="${viteDevUrl}">
+    <script type="module" th:src="${viteDevUrl + '/@vite/client'}" th:attr="nonce=${cspNonce}"></script>
+    <link rel="stylesheet" th:href="${viteDevUrl + '/css/main.css'}" th:attr="nonce=${cspNonce}">
+  </th:block>
+
+  <!--/* Prod mode: built, hashed assets */-->
+  <link th:if="${viteDevUrl == null}" rel="stylesheet" th:href="@{/assets/css/main.css}" th:attr="nonce=${cspNonce}">
 </head>
 <body>
   <!-- Header -->
@@ -63,6 +70,8 @@
   <!-- Footer -->
   <div th:replace="~{fragments/footer :: footer}"></div>
 
-  <script type="module" th:src="@{/assets/js/main.js}" th:attr="nonce=${cspNonce}"></script>
+  <!--/* Dev: JS from Vite with HMR. Prod: built hashed JS. */-->
+  <script th:if="${viteDevUrl}" type="module" th:src="${viteDevUrl + '/js/main.js'}" th:attr="nonce=${cspNonce}"></script>
+  <script th:if="${viteDevUrl == null}" type="module" th:src="@{/assets/js/main.js}" th:attr="nonce=${cspNonce}"></script>
 </body>
 </html>

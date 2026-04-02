@@ -3,7 +3,8 @@
    ========================================================================== */
 
 .c-site-navigation {
-  background-color: var(--color-gray-100);
+  background: #000;
+  color: var(--color-white);
   padding-block: var(--spacing-small);
   display: none;
 }
@@ -23,23 +24,24 @@
 .c-site-navigation__links a {
   font-size: var(--font-size-xs);
   text-transform: capitalize;
-  color: var(--color-gray-600);
+  color: var(--color-white);
   text-decoration: none;
 }
 
 .c-site-navigation__links a:hover {
-  color: var(--color-primary);
+  color: var(--color-gray-300);
   text-decoration: underline;
 }
 
 .c-site-footer {
-  background-color: var(--color-primary);
-  color: var(--color-gray-500);
-  padding-block: var(--spacing-medium);
+  background-color: var(--color-white);
+  color: var(--color-text);
+  padding: 2.625rem 0;
+  font-size: 0.6875rem;
 }
 
 .c-site-footer__legal p {
-  font-size: var(--font-size-xs);
+  font-size: 0.6875rem;
   line-height: 1.6;
   margin-block-end: var(--spacing-small);
 }

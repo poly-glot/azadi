@@ -5,8 +5,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Firebase CLI
+# Firebase CLI + Firestore emulator
 RUN npm install -g firebase-tools
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends google-cloud-cli-firestore-emulator \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create cache directories
 RUN mkdir -p /home/vscode/.m2 /home/vscode/.npm \

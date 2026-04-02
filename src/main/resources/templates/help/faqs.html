@@ -9,7 +9,7 @@
 <body>
 <div layout:fragment="content">
 
-  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">FAQs</h1>
+  <h1 class="u-site-heading">FAQs</h1>
 
   <!-- Dynamic FAQs from model -->
   <th:block th:if="${faqs != null}">
@@ -18,7 +18,7 @@
              th:open="${iter.index == 0}">
       <summary class="c-accordion__summary">
         <span class="c-accordion__label" th:text="${faq.question}">FAQ Question</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p th:text="${faq.answer}">FAQ answer content.</p>
@@ -31,7 +31,7 @@
     <details class="c-accordion c-accordion--faq" open>
       <summary class="c-accordion__summary">
         <span class="c-accordion__label">What should I do if the details on my finance agreement are wrong?</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p>Contact the retailer where you bought your goods from and we'll work with them to make sure your paperwork and any mistakes are put right as quickly as possible.</p>
@@ -41,7 +41,7 @@
     <details class="c-accordion c-accordion--faq">
       <summary class="c-accordion__summary">
         <span class="c-accordion__label">What if I have a problem with my goods?</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p>Please contact the retailer first to discuss the issue. If the matter is unresolved, contact our customer services team.</p>
@@ -51,7 +51,7 @@
     <details class="c-accordion c-accordion--faq">
       <summary class="c-accordion__summary">
         <span class="c-accordion__label">What can I do if I'm not happy with something in my finance agreement or the service I receive from Azadi Financial Services?</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p>We take all complaints seriously. Please contact our customer services team and we will do our best to resolve the issue.</p>
@@ -61,7 +61,7 @@
     <details class="c-accordion c-accordion--faq">
       <summary class="c-accordion__summary">
         <span class="c-accordion__label">Why is my current balance larger than I was expecting?</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p>Your balance includes any interest that has accrued since your last payment. Please contact us if you need a detailed breakdown.</p>
@@ -71,7 +71,7 @@
     <details class="c-accordion c-accordion--faq">
       <summary class="c-accordion__summary">
         <span class="c-accordion__label">How will my payments show up on my bank statement?</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p>Your payments will appear as "Azadi Financial Services" or "AFS" on your bank statement.</p>
@@ -81,7 +81,7 @@
     <details class="c-accordion c-accordion--faq">
       <summary class="c-accordion__summary">
         <span class="c-accordion__label">Can I change my payment date?</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p>Yes, you can change your payment date once during the lifetime of your agreement. Please note this may incur additional interest.</p>
@@ -91,7 +91,7 @@
     <details class="c-accordion c-accordion--faq">
       <summary class="c-accordion__summary">
         <span class="c-accordion__label">Why are you charging me for changing my payment date?</span>
-        <span class="c-accordion__indicator" aria-hidden="true">+</span>
+        
       </summary>
       <div class="c-accordion__panel c-accordion__panel--shadow">
         <p>Changing your payment date extends the period between payments which means additional interest may accrue during that time.</p>

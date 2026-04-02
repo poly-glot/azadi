@@ -9,11 +9,11 @@
 <body>
 <div layout:fragment="content">
 
-  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">My Account</h1>
+  <h1 class="u-site-heading">My Account</h1>
 
   <div th:each="agreement : ${agreements}">
 
-  <div style="border-block-end: 2px solid var(--border-color); padding-block-end: var(--spacing-small); margin-block-end: var(--spacing-medium);">
+  <div class="u-title u-title--border" style="margin-block-end: var(--spacing-medium); width: 100%;">
     <p class="u-h5 u-margin-bottom-none">
       <strong>Agreement number: </strong>
       <span th:text="${agreement.agreementNumber() ?: '12345 58936 54894'}">12345 58936 54894</span>
@@ -27,10 +27,10 @@
       <details class="c-accordion c-accordion--section" open>
         <summary class="c-accordion__summary">
           <span class="c-accordion__label">Account Details</span>
-          <span class="c-accordion__indicator" aria-hidden="true">+</span>
+          <!--/* no indicator — matches reference */-->
         </summary>
 
-        <div class="c-accordion__panel c-accordion__panel--shadow">
+        <div class="c-accordion__panel">
           <div class="c-table">
             <div class="c-table__row">
               <div class="c-table__column c-table__column--label">Current balance:</div>
@@ -54,7 +54,7 @@
             </div>
           </div>
 
-          <div style="padding: var(--spacing-small) var(--spacing-medium);">
+          <div class="c-accordion__content">
             <p><strong>Model:</strong> <span th:text="${agreement.vehicleModel() ?: 'AZADI SUMMIT V8 TOURING'}">AZADI SUMMIT V8 TOURING</span></p>
             <p class="u-margin-bottom-none"><strong>Registration Number:</strong> <span th:text="${agreement.registration() ?: 'AB68 ABC'}">AB68 ABC</span></p>
           </div>
@@ -67,10 +67,10 @@
       <details class="c-accordion c-accordion--section" open>
         <summary class="c-accordion__summary">
           <span class="c-accordion__label">Payment Details</span>
-          <span class="c-accordion__indicator" aria-hidden="true">+</span>
+          <!--/* no indicator — matches reference */-->
         </summary>
 
-        <div class="c-accordion__panel c-accordion__panel--shadow">
+        <div class="c-accordion__panel">
           <div class="c-table">
             <div class="c-table__row">
               <div class="c-table__column c-table__column--label">Last payment received:</div>

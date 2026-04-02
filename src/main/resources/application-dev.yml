@@ -1,6 +1,15 @@
 spring:
+  docker:
+    compose:
+      enabled: false
   thymeleaf:
     cache: false
+  devtools:
+    restart:
+      additional-paths:
+        - src/main/resources/templates
+      poll-interval: 1s
+      quiet-period: 400ms
   cloud:
     gcp:
       datastore:
@@ -16,3 +25,7 @@ server:
 azadi:
   encryption-key: dev-only-key-change-in-prod-32ch
   encryption-salt: a1b2c3d4e5f6a7b8
+  # Vite dev server URL — Thymeleaf injects this for HMR asset loading
+  vite-dev-url: http://localhost:5173
+  # Auto-seed Firestore emulator with JSON fixture data
+  seed-data: true

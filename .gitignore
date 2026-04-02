@@ -13,3 +13,5 @@ local.env
 .firebaserc.local
 .claude/worktrees/
 .DS_Store
+azadi-static-frontend/
+e2e/

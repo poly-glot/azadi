@@ -4,7 +4,12 @@ import { resolve } from 'path';
 export default defineConfig({
   root: 'src',
   server: {
+    port: 5173,
+    // Allow Spring Boot at :8080 to load assets from Vite
     cors: true,
+    // Serve images from src/img/ at /img/* for Vite dev
+    // Thymeleaf references /assets/img/* — handled by the origin config below
+    origin: 'http://localhost:5173',
   },
   build: {
     outDir: '../dist',

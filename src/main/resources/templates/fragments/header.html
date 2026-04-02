@@ -6,14 +6,14 @@
   <div class="o-wrapper c-site-header__wrapper">
     <a th:href="@{/}" class="c-site-header__brand">
       <img th:src="@{/assets/img/logo-azadi.svg}" alt="" class="c-site-header__logo">
-      <span class="c-site-header__title">Financial Services</span>
+      <div class="c-site-header__title">Financial Services</div>
     </a>
 
     <div class="c-site-header__nav">
       <!-- Desktop nav (authenticated) -->
       <nav sec:authorize="isAuthenticated()" class="c-site-header__nav--desktop">
         <a th:href="@{/finance/make-a-payment}" class="c-button">Make a Payment</a>
-        <a th:href="@{/logout}" class="c-button c-button--secondary" style="color: #fff; border-color: #fff;">Logout</a>
+        <a th:href="@{/logout}" class="c-button c-button--secondary">Logout</a>
       </nav>
 
       <!-- Mobile hamburger (authenticated) -->
@@ -60,7 +60,6 @@
                  th:open="${#strings.contains(#httpServletRequest.requestURI, '/finance/')}">
           <summary>
             <span class="c-nav-link__label">Manage My Finance</span>
-            <span class="c-nav-details__indicator" aria-hidden="true">+</span>
           </summary>
           <div class="c-nav-sub">
             <a th:href="@{/finance/make-a-payment}" class="c-nav-sub__link"
@@ -98,7 +97,6 @@
                  th:open="${#strings.contains(#httpServletRequest.requestURI, '/help/')}">
           <summary>
             <span class="c-nav-link__label">Help</span>
-            <span class="c-nav-details__indicator" aria-hidden="true">+</span>
           </summary>
           <div class="c-nav-sub">
             <a th:href="@{/help/faqs}" class="c-nav-sub__link"

@@ -9,7 +9,7 @@
 <body>
 <div layout:fragment="content">
 
-  <h1 class="u-condense" style="font-size: var(--font-size-2xl); text-transform: capitalize;">My Contact Details</h1>
+  <h1 class="u-site-heading">My Contact Details</h1>
 
   <div class="c-alert c-alert--danger">
     Please note that any changes you make to your current address using this facility will be automatically applied
@@ -25,7 +25,7 @@
   <details class="c-accordion c-accordion--section" open>
     <summary class="c-accordion__summary">
       <span class="c-accordion__label">Address</span>
-      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+      
     </summary>
     <div class="c-accordion__panel c-accordion__panel--shadow">
       <form th:action="@{/my-contact-details/address}" method="post">
@@ -57,7 +57,7 @@
   <details class="c-accordion c-accordion--section" open>
     <summary class="c-accordion__summary">
       <span class="c-accordion__label">Contact Details</span>
-      <span class="c-accordion__indicator" aria-hidden="true">+</span>
+      
     </summary>
     <div class="c-accordion__panel c-accordion__panel--shadow">
 

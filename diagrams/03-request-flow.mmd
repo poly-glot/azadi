@@ -1,0 +1,23 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000', 'actorBorder': '#000000', 'actorBkg': '#ffffff', 'actorTextColor': '#000000', 'signalColor': '#000000', 'signalTextColor': '#000000', 'noteBkgColor': '#f5f5f5', 'noteBorderColor': '#000000', 'noteTextColor': '#000000', 'activationBkgColor': '#f5f5f5', 'activationBorderColor': '#000000', 'fontFamily': 'Arial', 'fontSize': '14px'}, 'sequence': {'messageLineWidth': 3, 'actorBorderWidth': 3}, 'themeCSS': '.messageLine0, .messageLine1 { stroke-width: 3px !important; } .actor { stroke-width: 2px !important; } .note { stroke-width: 2px !important; } .loopLine { stroke-width: 2px !important; }'}}%%
+
+sequenceDiagram
+    participant B as Browser
+    participant SB as Spring Boot
+    participant FS as Firestore
+    participant ST as Stripe
+
+    B->>SB: GET /my-account
+    SB->>SB: Session auth check
+    SB->>FS: Fetch agreements
+    FS-->>SB: Agreement data
+    SB-->>B: Rendered HTML
+
+    Note over B,ST: Payment Flow
+
+    B->>SB: POST /finance/make-a-payment
+    SB->>ST: Create PaymentIntent
+    ST-->>SB: client_secret
+    SB-->>B: Stripe Elements form
+    B->>ST: Confirm payment
+    ST->>SB: Webhook event
+    SB->>FS: Record payment
