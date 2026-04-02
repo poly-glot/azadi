@@ -20,15 +20,26 @@
     Your statement request has been submitted successfully.
   </div>
 
+  <!-- Agreement selector (when multiple) -->
+  <div th:if="${agreements != null and agreements.size() > 1}" class="u-margin-bottom-normal">
+    <label for="agreementSelect" class="c-form__label">Select Agreement:</label>
+    <select id="agreementSelect" class="c-select"
+            onchange="document.querySelectorAll('.js-agreement-id').forEach(el => el.value = this.value)">
+      <option th:each="agr : ${agreements}" th:value="${agr.id}" th:text="${agr.agreementNumber}"></option>
+    </select>
+  </div>
+
   <!-- Email Statement -->
-  <form th:action="@{/finance/request-a-statement/email}" method="post" class="u-margin-bottom-normal">
+  <form th:action="@{/finance/request-a-statement}" method="post" class="u-margin-bottom-normal">
+    <input type="hidden" name="agreementId" class="js-agreement-id"
+           th:value="${agreements != null and !agreements.empty ? agreements[0].id : ''}">
     <div class="c-panel c-panel--header u-padding-none">
       <div class="c-panel__inner">
         <div class="c-inline-edit" data-inline-edit>
           <div class="c-inline-edit__display">
             <div>
               <strong class="c-inline-edit__label">Email Address:</strong>
-              <span class="c-inline-edit__value" th:text="${contactDetails.email ?: 'john.smith@internet.co.uk'}">john.smith@internet.co.uk</span>
+              <span class="c-inline-edit__value" th:text="${email} ?: 'john.smith@internet.co.uk'">john.smith@internet.co.uk</span>
             </div>
             <button type="button" class="c-inline-edit__button" data-inline-edit-trigger>Edit Email Address</button>
           </div>
@@ -36,7 +47,7 @@
             <div>
               <strong class="c-inline-edit__label">New Email Address:</strong>
               <input type="email" name="email" class="c-input"
-                     th:placeholder="${contactDetails.email ?: 'john.smith@internet.co.uk'}">
+                     th:placeholder="${email} ?: 'john.smith@internet.co.uk'">
             </div>
             <div class="c-inline-edit__actions">
               <button type="submit" class="c-button c-button--small">Confirm</button>
@@ -48,20 +59,22 @@
     </div>
     <div class="c-panel c-panel--content">
       <div class="c-panel__inner">
-        <button type="submit" name="action" value="sendEmail" class="c-button c-button--cta">Send Statement</button>
+        <button type="submit" class="c-button c-button--cta">Send Statement</button>
       </div>
     </div>
   </form>
 
   <!-- Post Statement -->
-  <form th:action="@{/finance/request-a-statement/post}" method="post" class="u-margin-bottom-normal">
+  <form th:action="@{/finance/request-a-statement}" method="post" class="u-margin-bottom-normal">
+    <input type="hidden" name="agreementId" class="js-agreement-id"
+           th:value="${agreements != null and !agreements.empty ? agreements[0].id : ''}">
     <div class="c-panel c-panel--header u-padding-none">
       <div class="c-panel__inner">
         <div class="c-inline-edit" data-inline-edit>
           <div class="c-inline-edit__display">
             <div>
               <strong class="c-inline-edit__label">Current Address:</strong>
-              <span class="c-inline-edit__value" th:text="${contactDetails.address ?: '29 Street Name, Town, County A12 BCD'}">29 Street Name, Town, County A12 BCD</span>
+              <span class="c-inline-edit__value" th:text="${address} ?: '29 Street Name, Town, County A12 BCD'">29 Street Name, Town, County A12 BCD</span>
             </div>
             <button type="button" class="c-inline-edit__button" data-inline-edit-trigger>Edit Address</button>
           </div>
@@ -69,10 +82,11 @@
             <div>
               <strong class="c-inline-edit__label">New Address:</strong>
               <input type="text" name="houseName" class="c-input c-input--medium" placeholder="House Number/Name">
-              <input type="text" name="postcode" class="c-input c-input--small" placeholder="Postcode" style="margin-block-start: var(--spacing-tiny);">
+              <input type="text" name="postcode" class="c-input c-input--small" placeholder="Postcode"
+                     style="margin-block-start: var(--spacing-tiny);">
             </div>
             <div class="c-inline-edit__actions">
-              <button type="submit" name="action" value="lookup" class="c-button c-button--small">Look Up</button>
+              <button type="submit" class="c-button c-button--small">Look Up</button>
               <button type="button" class="c-button c-button--secondary c-button--small" data-inline-edit-cancel>Cancel</button>
             </div>
           </div>
@@ -81,7 +95,7 @@
     </div>
     <div class="c-panel c-panel--content">
       <div class="c-panel__inner">
-        <button type="submit" name="action" value="requestPost" class="c-button c-button--cta">Request Statement</button>
+        <button type="submit" class="c-button c-button--cta">Request Statement</button>
       </div>
     </div>
   </form>
