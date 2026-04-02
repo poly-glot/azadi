@@ -2,7 +2,7 @@ package com.azadi.email;
 
 import com.azadi.auth.Customer;
 import com.azadi.auth.CustomerRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class EmailServiceTest {
     @BeforeEach
     void setUp() {
         emailService = new EmailService("re_test_mock", "test@azadi.test",
-            customerRepository, new ObjectMapper(), HttpClient.newHttpClient());
+            customerRepository, JsonMapper.shared(), HttpClient.newHttpClient());
     }
 
     @Test

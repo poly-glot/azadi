@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  JAVA_VERSION: '21'
+  JAVA_VERSION: '25'
   NODE_VERSION: '22'
   GCP_REGION: ${{ vars.GCP_REGION || 'europe-west2' }}
   GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || 'firebase-cloud-491613' }}

@@ -6,8 +6,8 @@ import com.azadi.email.templates.LoginAlertTemplate;
 import com.azadi.email.templates.PaymentConfirmationTemplate;
 import com.azadi.email.templates.PaymentDateChangedTemplate;
 import com.azadi.email.templates.SettlementFigureTemplate;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class EmailService {
     private static final String RESEND_API_URL = "https://api.resend.com/emails";
 
     private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
     private final String apiKey;
     private final String fromEmail;
     private final CustomerRepository customerRepository;
@@ -35,7 +35,7 @@ public class EmailService {
     public EmailService(@Value("${resend.api-key}") String apiKey,
                         @Value("${resend.from-email}") String fromEmail,
                         CustomerRepository customerRepository,
-                        ObjectMapper objectMapper,
+                        JsonMapper objectMapper,
                         HttpClient httpClient) {
         this.apiKey = apiKey;
         this.fromEmail = fromEmail;
@@ -53,7 +53,7 @@ public class EmailService {
                 "subject", subject,
                 "html", html
             ));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             LOG.error("Failed to serialize email payload for {}", to, e);
             return;
         }

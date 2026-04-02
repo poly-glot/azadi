@@ -1,7 +1,7 @@
 package com.azadi.audit;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +23,9 @@ public class AuditService {
     private static final Logger LOG = LoggerFactory.getLogger(AuditService.class);
 
     private final AuditRepository auditRepository;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
-    public AuditService(AuditRepository auditRepository, ObjectMapper objectMapper) {
+    public AuditService(AuditRepository auditRepository, JsonMapper objectMapper) {
         this.auditRepository = auditRepository;
         this.objectMapper = objectMapper;
     }
@@ -51,7 +51,7 @@ public class AuditService {
     private String serializeDetails(Map<String, String> details) {
         try {
             return objectMapper.writeValueAsString(details);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             LOG.warn("Failed to serialize audit details", e);
             return "{}";
         }

@@ -1,7 +1,7 @@
 # ============================================================
 # Stage: deps -- shared dependency resolution
 # ============================================================
-FROM eclipse-temurin:21-jdk-noble AS deps
+FROM eclipse-temurin:25-jdk-noble AS deps
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ ENV VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
 RUN --mount=type=cache,target=/root/.m2,sharing=locked \
     ./mvnw package -P no-checks,frontend -B -DskipTests
 
-FROM eclipse-temurin:21-jre-noble AS jvm
+FROM eclipse-temurin:25-jre-noble AS jvm
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
@@ -39,13 +39,13 @@ USER appuser
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "--add-opens", "java.base/java.math=ALL-UNNAMED", "-jar", "app.jar"]
 
 # ============================================================
 # Target: native -- GraalVM native image (main branch)
 # Slow build (~15min), tiny image, instant startup, low memory
 # ============================================================
-FROM ghcr.io/graalvm/native-image-community:21 AS native-builder
+FROM ghcr.io/graalvm/native-image-community:25 AS native-builder
 
 ARG VITE_STRIPE_PUBLISHABLE_KEY
 ENV VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}

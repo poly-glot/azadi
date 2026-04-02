@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>4.0.5</version>
         <relativePath/>
     </parent>
 
@@ -18,14 +18,14 @@
     <description>Azadi Finance Portal</description>
 
     <properties>
-        <java.version>21</java.version>
-        <spring-cloud-gcp.version>6.0.0</spring-cloud-gcp.version>
+        <java.version>25</java.version>
+        <spring-cloud-gcp.version>8.0.1</spring-cloud-gcp.version>
         <stripe.version>31.3.0</stripe.version>
         <owasp-sanitizer.version>20240325.1</owasp-sanitizer.version>
-        <spotbugs-annotations.version>4.8.6</spotbugs-annotations.version>
-        <testcontainers.version>1.21.4</testcontainers.version>
+        <spotbugs-annotations.version>4.9.8</spotbugs-annotations.version>
+        <testcontainers.version>2.0.4</testcontainers.version>
         <checkstyle.version>10.21.1</checkstyle.version>
-        <pmd.version>7.9.0</pmd.version>
+        <pmd.version>7.17.0</pmd.version>
     </properties>
 
     <dependencyManagement>
@@ -79,10 +79,11 @@
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
 
-        <!-- Thymeleaf Layout Dialect (layout:decorate, layout:fragment) -->
+        <!-- Thymeleaf Layout Dialect — pure Java port, no Groovy (GraalVM native compatible) -->
         <dependency>
-            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <groupId>com.github.zhanhb</groupId>
             <artifactId>thymeleaf-layout-dialect</artifactId>
+            <version>3.2.0</version>
         </dependency>
 
         <!-- Stripe -->
@@ -140,8 +141,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -151,7 +162,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
@@ -196,9 +207,7 @@
                         <include>**/*IntegrationTest.java</include>
                         <include>**/*IT.java</include>
                     </includes>
-                    <argLine>
-                        @{argLine} --add-opens java.base/java.math=ALL-UNNAMED
-                    </argLine>
+                    <argLine>@{argLine} --add-opens java.base/java.math=ALL-UNNAMED</argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -241,7 +250,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.26.0</version>
+                <version>3.28.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>net.sourceforge.pmd</groupId>
@@ -268,7 +277,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.8.6.6</version>
+                <version>4.9.8.3</version>
                 <configuration>
                     <excludeFilterFile>src/main/resources/checkstyle/spotbugs-exclude.xml</excludeFilterFile>
                     <effort>Max</effort>
@@ -286,7 +295,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.13</version>
                 <configuration>
                     <excludes>
                         <exclude>com/azadi/AzadiApplication.class</exclude>
@@ -380,7 +389,7 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>11.1.1</version>
+                <version>12.2.0</version>
                 <configuration>
                     <suppressionFiles>
                         <suppressionFile>src/main/resources/checkstyle/owasp-suppressions.xml</suppressionFile>

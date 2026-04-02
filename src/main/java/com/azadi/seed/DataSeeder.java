@@ -7,9 +7,9 @@ import com.azadi.bank.BankDetailsEncryptor;
 import com.azadi.document.Document;
 import com.azadi.payment.PaymentRecord;
 import com.azadi.settlement.SettlementFigure;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.cloud.spring.data.datastore.core.DatastoreTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,11 +45,11 @@ public class DataSeeder implements CommandLineRunner {
 
     private final DatastoreTemplate datastoreTemplate;
     private final BankDetailsEncryptor encryptor;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
     public DataSeeder(DatastoreTemplate datastoreTemplate,
                       BankDetailsEncryptor encryptor,
-                      ObjectMapper objectMapper) {
+                      JsonMapper objectMapper) {
         this.datastoreTemplate = datastoreTemplate;
         this.encryptor = encryptor;
         this.objectMapper = objectMapper;
