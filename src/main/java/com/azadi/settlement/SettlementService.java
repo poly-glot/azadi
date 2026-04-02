@@ -10,6 +10,9 @@ import java.util.List;
 @Service
 public class SettlementService {
 
+    private static final long EARLY_SETTLEMENT_FEE_BPS = 200;
+    private static final int SETTLEMENT_VALIDITY_DAYS = 28;
+
     private final SettlementRepository settlementRepository;
     private final AgreementService agreementService;
 
@@ -22,8 +25,7 @@ public class SettlementService {
     public SettlementFigure calculateSettlement(String customerId, Long agreementId) {
         var agreement = agreementService.getAgreement(customerId, agreementId);
 
-        // Simple settlement calculation: balance + early settlement fee (2% of balance)
-        var earlySettlementFee = (long) (agreement.getBalancePence() * 0.02);
+        var earlySettlementFee = agreement.getBalancePence() * EARLY_SETTLEMENT_FEE_BPS / 10_000;
         var totalSettlement = agreement.getBalancePence() + earlySettlementFee;
 
         var settlement = new SettlementFigure();
@@ -31,7 +33,7 @@ public class SettlementService {
         settlement.setCustomerId(customerId);
         settlement.setAmountPence(totalSettlement);
         settlement.setCalculatedAt(Instant.now());
-        settlement.setValidUntil(LocalDate.now().plusDays(28));
+        settlement.setValidUntil(LocalDate.now().plusDays(SETTLEMENT_VALIDITY_DAYS));
 
         return settlementRepository.save(settlement);
     }

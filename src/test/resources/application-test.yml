@@ -31,6 +31,7 @@ resend:
 
 azadi:
   encryption-key: test-encryption-key-32chars!!!
+  encryption-salt: a1b2c3d4e5f6a7b8
   app-domain: localhost
 
 logging:

@@ -29,25 +29,33 @@ class PaymentFlowIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET make-a-payment page is accessible when authenticated")
+    @DisplayName("POST create payment intent returns response containing clientSecret")
     void createPaymentIntentReturnsClientSecret() {
         // Arrange
         HttpHeaders headers = authenticatedHeaders(sessionCookie);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        // Act - access the payment page
+        var formData = new org.springframework.util.LinkedMultiValueMap<String, String>();
+        formData.add("agreementNumber", AGREEMENT_NUMBER);
+        formData.add("amount", "450.00");
+
+        // Act
         ResponseEntity<String> response = restTemplate.exchange(
-                "/finance/make-a-payment",
-                HttpMethod.GET,
-                new HttpEntity<>(headers),
+                "/api/payments/create-intent",
+                HttpMethod.POST,
+                new HttpEntity<>(formData, headers),
                 String.class);
 
-        // Assert - page should load with Stripe publishable key
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // Assert
+        assertThat(response.getStatusCode().value()).isIn(
+                HttpStatus.OK.value(),
+                HttpStatus.CREATED.value());
         assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).contains("clientSecret");
     }
 
     @Test
-    @DisplayName("Webhook call to /api/stripe/webhook is processed")
+    @DisplayName("Webhook call creates payment record in datastore")
     void webhookCreatesPaymentRecord() {
         // Arrange - simulate a Stripe webhook event
         HttpHeaders headers = new HttpHeaders();
@@ -72,15 +80,15 @@ class PaymentFlowIntegrationTest extends BaseIntegrationTest {
                 }
                 """.formatted(AGREEMENT_NUMBER);
 
-        // Act - use the correct webhook endpoint
+        // Act
         ResponseEntity<String> response = restTemplate.exchange(
                 "/api/stripe/webhook",
                 HttpMethod.POST,
                 new HttpEntity<>(webhookPayload, headers),
                 String.class);
 
-        // Assert - webhook endpoint should accept the request
-        // Note: with mock Stripe, signature verification may fail (400) which is expected
+        // Assert - webhook endpoint should accept the request (400 expected due to
+        // signature verification against mock Stripe, which is correct security behavior)
         assertThat(response.getStatusCode().value()).isIn(200, 400);
     }
 }

@@ -10,8 +10,9 @@ public class BankDetailsEncryptor {
 
     private final TextEncryptor textEncryptor;
 
-    public BankDetailsEncryptor(@Value("${azadi.encryption-key}") String encryptionKey) {
-        this.textEncryptor = Encryptors.delux(encryptionKey, "a1b2c3d4e5f6a7b8");
+    public BankDetailsEncryptor(@Value("${azadi.encryption-key}") String encryptionKey,
+                                @Value("${azadi.encryption-salt}") String encryptionSalt) {
+        this.textEncryptor = Encryptors.delux(encryptionKey, encryptionSalt);
     }
 
     public String encrypt(String plaintext) {

@@ -33,10 +33,8 @@ class RateLimitIntegrationTest extends BaseIntegrationTest {
     @DisplayName("First 5 failed login attempts all receive normal responses")
     void firstFiveAttemptsGetNormalResponses() {
         for (int i = 0; i < 5; i++) {
-            // Act
             ResponseEntity<String> response = performLoginAttempt(AGREEMENT_NUMBER, WRONG_DOB, POSTCODE);
 
-            // Assert - should get a normal response (200 with error or 302 redirect)
             assertThat(response.getStatusCode().value())
                     .as("Attempt %d should not be rate limited", i + 1)
                     .isIn(200, 302);
@@ -46,15 +44,12 @@ class RateLimitIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("6th failed login attempt returns 429 Too Many Requests")
     void sixthAttemptReturns429() {
-        // Arrange - exhaust the allowed attempts
         for (int i = 0; i < 6; i++) {
             performLoginAttempt(AGREEMENT_NUMBER, WRONG_DOB, POSTCODE);
         }
 
-        // Act - the 7th attempt (to be safe, since threshold might be checked differently)
         ResponseEntity<String> response = performLoginAttempt(AGREEMENT_NUMBER, WRONG_DOB, POSTCODE);
 
-        // Assert - should be rate limited
         assertThat(response.getStatusCode().value()).isIn(
                 HttpStatus.TOO_MANY_REQUESTS.value(),
                 HttpStatus.FORBIDDEN.value());
@@ -63,27 +58,22 @@ class RateLimitIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Rate limit tracks by IP for login attempts")
     void rateLimitTracksIndependently() {
-        // Arrange - exhaust login rate limit for this IP (5 attempts max)
         for (int i = 0; i < 5; i++) {
             performLoginAttempt(AGREEMENT_NUMBER, WRONG_DOB, POSTCODE);
         }
 
-        // Act - attempt with a different agreement number but same IP
         createTestCustomer(DOB, POSTCODE, "AGR-RATE-002");
         ResponseEntity<String> response = performLoginAttempt("AGR-RATE-002", WRONG_DOB, POSTCODE);
 
-        // Assert - same IP should still be rate limited (IP-based rate limiting)
         assertThat(response.getStatusCode().value()).isIn(
                 HttpStatus.TOO_MANY_REQUESTS.value(),
                 HttpStatus.FORBIDDEN.value());
     }
 
     private ResponseEntity<String> performLoginAttempt(String agreementNumber, LocalDate dob, String postcode) {
-        // Get login page for CSRF token
         ResponseEntity<String> loginPage = restTemplate.getForEntity("/login", String.class);
-        String csrfToken = extractCsrfTokenFromPage(loginPage.getBody());
-        List<String> cookies = loginPage.getHeaders().get(HttpHeaders.SET_COOKIE);
-        String sessionCookie = (cookies != null && !cookies.isEmpty()) ? cookies.getFirst() : "";
+        String csrfToken = extractCsrfToken(loginPage.getBody());
+        String sessionCookie = extractSessionCookie(loginPage);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -99,20 +89,5 @@ class RateLimitIntegrationTest extends BaseIntegrationTest {
         }
 
         return restTemplate.postForEntity("/login", new HttpEntity<>(formData, headers), String.class);
-    }
-
-    private String extractCsrfTokenFromPage(String html) {
-        if (html == null) return null;
-        int idx = html.indexOf("name=\"_csrf\"");
-        if (idx == -1) return null;
-        int start = Math.max(0, idx - 200);
-        int end = Math.min(html.length(), idx + 200);
-        String region = html.substring(start, end);
-        int valueIdx = region.indexOf("value=\"");
-        if (valueIdx == -1) return null;
-        int valueStart = valueIdx + "value=\"".length();
-        int valueEnd = region.indexOf("\"", valueStart);
-        if (valueEnd == -1) return null;
-        return region.substring(valueStart, valueEnd);
     }
 }

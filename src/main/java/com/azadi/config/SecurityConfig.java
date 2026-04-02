@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.header.HeaderWriterFilter;
 
@@ -36,7 +35,7 @@ public class SecurityConfig {
             .authenticationProvider(azadiAuthenticationProvider)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/login-error", "/assets/**",
-                    "/actuator/health", "/api/stripe/webhook").permitAll()
+                    "/actuator/health", "/api/stripe/webhook", "/api/csp-report").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -70,8 +69,7 @@ public class SecurityConfig {
                 )
             )
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .csrfTokenRepository(new CookieCsrfTokenRepository())
                 .ignoringRequestMatchers("/api/stripe/webhook")
             )
             .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)

@@ -29,17 +29,20 @@ public class PaymentController {
     private static final Logger LOG = LoggerFactory.getLogger(PaymentController.class);
 
     private final PaymentService paymentService;
+    private final PaymentWebhookHandler webhookHandler;
     private final StripePaymentService stripePaymentService;
     private final AgreementService agreementService;
     private final AuthorizationService authorizationService;
     private final String stripePublishableKey;
 
     public PaymentController(PaymentService paymentService,
+                             PaymentWebhookHandler webhookHandler,
                              StripePaymentService stripePaymentService,
                              AgreementService agreementService,
                              AuthorizationService authorizationService,
                              @Value("${stripe.publishable-key}") String stripePublishableKey) {
         this.paymentService = paymentService;
+        this.webhookHandler = webhookHandler;
         this.stripePaymentService = stripePaymentService;
         this.agreementService = agreementService;
         this.authorizationService = authorizationService;
@@ -69,7 +72,7 @@ public class PaymentController {
                 request.amountPence(),
                 agreement.getId(),
                 agreement.getAgreementNumber(),
-                "", // email resolved from customer record
+                customerId,
                 ipAddress
             );
 
@@ -96,14 +99,14 @@ public class PaymentController {
                     var paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
                         .getObject().orElse(null);
                     if (paymentIntent != null) {
-                        paymentService.handlePaymentSuccess(paymentIntent.getId(), event.getId(), ipAddress);
+                        webhookHandler.handlePaymentSuccess(paymentIntent.getId(), event.getId(), ipAddress);
                     }
                 }
                 case "payment_intent.payment_failed" -> {
                     var paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
                         .getObject().orElse(null);
                     if (paymentIntent != null) {
-                        paymentService.handlePaymentFailure(paymentIntent.getId(), event.getId(), ipAddress);
+                        webhookHandler.handlePaymentFailure(paymentIntent.getId(), event.getId(), ipAddress);
                     }
                 }
                 default -> LOG.info("Unhandled webhook event type: {}", event.getType());

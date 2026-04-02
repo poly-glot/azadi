@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -47,12 +48,12 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
 
         // Fetch login page for CSRF
         ResponseEntity<String> loginPage = restTemplate.getForEntity("/login", String.class);
-        String csrfToken = extractCsrf(loginPage);
-        String cookies = buildCookieHeader(loginPage, "");
+        String csrfToken = extractCsrfToken(loginPage.getBody());
+        String sessionCookie = extractSessionCookie(loginPage);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set(HttpHeaders.COOKIE, cookies);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set(HttpHeaders.COOKIE, sessionCookie);
 
         String formattedDob = wrongDob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -79,31 +80,14 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
         // Arrange - login first
         String sessionCookie = loginAs(AGREEMENT_NUMBER, DOB, POSTCODE);
 
-        // GET a page with a form to extract the CSRF token for the logout POST
-        HttpHeaders getHeaders = authenticatedHeaders(sessionCookie);
-        ResponseEntity<String> page = restTemplate.exchange(
-                "/my-contact-details", HttpMethod.GET, new HttpEntity<>(getHeaders), String.class);
-
-        String csrfToken = extractCsrf(page);
-        String cookieHeader = buildCookieHeader(page, sessionCookie);
-
-        // Act - logout with CSRF token
-        HttpHeaders logoutHeaders = new HttpHeaders();
-        logoutHeaders.set(HttpHeaders.COOKIE, cookieHeader);
-        logoutHeaders.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
-
-        var logoutForm = new org.springframework.util.LinkedMultiValueMap<String, String>();
-        if (csrfToken != null) {
-            logoutForm.add("_csrf", csrfToken);
-        }
-
+        // Act - logout
+        HttpHeaders headers = authenticatedHeaders(sessionCookie);
         restTemplate.exchange(
-                "/logout", HttpMethod.POST,
-                new HttpEntity<>(logoutForm, logoutHeaders), String.class);
+                "/logout", HttpMethod.POST, new HttpEntity<>(headers), String.class);
 
-        // Assert - after logout, accessing /my-account with old session should show login page
+        // Assert - after logout, accessing /my-account should show login page
         ResponseEntity<String> protectedResponse = restTemplate.exchange(
-                "/my-account", HttpMethod.GET, new HttpEntity<>(getHeaders), String.class);
+                "/my-account", HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
         assertThat(protectedResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(protectedResponse.getBody()).contains("login");

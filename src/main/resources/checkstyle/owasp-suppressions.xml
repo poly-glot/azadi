@@ -15,10 +15,4 @@
         <vulnerabilityName regex="true">^CVE-.*$</vulnerabilityName>
     </suppress>
 
-    <!-- Spring Framework managed by Spring Boot BOM -->
-    <suppress>
-        <notes>Spring Framework version managed by Spring Boot parent BOM</notes>
-        <gav regex="true">^org\.springframework:.*$</gav>
-        <cpe>cpe:/a:vmware:spring_framework</cpe>
-    </suppress>
 </suppressions>

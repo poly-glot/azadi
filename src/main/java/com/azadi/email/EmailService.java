@@ -6,6 +6,8 @@ import com.azadi.email.templates.LoginAlertTemplate;
 import com.azadi.email.templates.PaymentConfirmationTemplate;
 import com.azadi.email.templates.PaymentDateChangedTemplate;
 import com.azadi.email.templates.SettlementFigureTemplate;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService {
@@ -23,33 +27,36 @@ public class EmailService {
     private static final String RESEND_API_URL = "https://api.resend.com/emails";
 
     private final HttpClient httpClient;
+    private final ObjectMapper objectMapper;
     private final String apiKey;
     private final String fromEmail;
     private final CustomerRepository customerRepository;
 
     public EmailService(@Value("${resend.api-key}") String apiKey,
                         @Value("${resend.from-email}") String fromEmail,
-                        CustomerRepository customerRepository) {
-        this.httpClient = HttpClient.newHttpClient();
+                        CustomerRepository customerRepository,
+                        ObjectMapper objectMapper,
+                        HttpClient httpClient) {
         this.apiKey = apiKey;
         this.fromEmail = fromEmail;
         this.customerRepository = customerRepository;
+        this.objectMapper = objectMapper;
+        this.httpClient = httpClient;
     }
 
     public void sendEmail(String to, String subject, String html) {
-        var escapedHtml = html.replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r");
-
-        var body = """
-            {
-              "from": "%s",
-              "to": ["%s"],
-              "subject": "%s",
-              "html": "%s"
-            }
-            """.formatted(fromEmail, to, subject, escapedHtml);
+        String body;
+        try {
+            body = objectMapper.writeValueAsString(Map.of(
+                "from", fromEmail,
+                "to", List.of(to),
+                "subject", subject,
+                "html", html
+            ));
+        } catch (JsonProcessingException e) {
+            LOG.error("Failed to serialize email payload for {}", to, e);
+            return;
+        }
 
         var request = HttpRequest.newBuilder()
             .uri(URI.create(RESEND_API_URL))

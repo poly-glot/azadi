@@ -14,9 +14,9 @@ public class LoginAttemptTracker {
     private static final int MAX_ATTEMPTS = 5;
     private static final Duration LOCK_DURATION = Duration.ofMinutes(30);
 
-    record LoginAttempt(AtomicInteger count, Instant lockUntil) {
+    record LoginAttempt(AtomicInteger count, Instant lockUntil, Instant createdAt) {
         static LoginAttempt create() {
-            return new LoginAttempt(new AtomicInteger(0), Instant.MIN);
+            return new LoginAttempt(new AtomicInteger(0), Instant.MIN, Instant.now());
         }
     }
 
@@ -35,7 +35,7 @@ public class LoginAttemptTracker {
         var count = attempt.count().incrementAndGet();
         if (count >= MAX_ATTEMPTS) {
             attempts.put(agreementNumber,
-                new LoginAttempt(new AtomicInteger(count), Instant.now().plus(LOCK_DURATION)));
+                new LoginAttempt(new AtomicInteger(count), Instant.now().plus(LOCK_DURATION), attempt.createdAt()));
         }
     }
 
@@ -49,9 +49,13 @@ public class LoginAttemptTracker {
 
     @Scheduled(fixedRate = 300_000)
     public void cleanupExpiredEntries() {
+        var now = Instant.now();
         attempts.entrySet().removeIf(entry -> {
             var attempt = entry.getValue();
-            return attempt.count().get() >= MAX_ATTEMPTS && Instant.now().isAfter(attempt.lockUntil());
+            if (attempt.count().get() >= MAX_ATTEMPTS) {
+                return now.isAfter(attempt.lockUntil());
+            }
+            return now.isAfter(attempt.createdAt().plus(LOCK_DURATION));
         });
     }
 }

@@ -36,7 +36,8 @@ public class CspNonceFilter extends OncePerRequestFilter {
             "img-src 'self' data:; ",
             "connect-src 'self' https://api.stripe.com; ",
             "base-uri 'self'; ",
-            "form-action 'self';"
+            "form-action 'self'; ",
+            "report-uri /api/csp-report;"
         );
 
         response.setHeader("Content-Security-Policy", csp);
