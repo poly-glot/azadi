@@ -18,7 +18,7 @@ import java.util.Locale;
 @Component
 public class AzadiAuthenticationProvider implements AuthenticationProvider {
 
-    private static final DateTimeFormatter DOB_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DOB_FORMAT = DateTimeFormatter.ofPattern("d/M/yyyy");
 
     private final AgreementRepository agreementRepository;
     private final CustomerRepository customerRepository;

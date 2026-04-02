@@ -12,11 +12,13 @@ spring:
       quiet-period: 400ms
   cloud:
     gcp:
+      project-id: demo-azadi
       secretmanager:
         enabled: false
       datastore:
         emulator:
           enabled: true
+          port: 8081
 
 server:
   servlet:

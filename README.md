@@ -133,14 +133,14 @@ devcontainer exec --workspace-folder . zsh -ic dev-frontend
 devcontainer exec --workspace-folder . zsh -ic dev
 
 # Claude Code
-devcontainer exec --workspace-folder . zsh -ic claude
+devcontainer exec --workspace-folder . zsh -ic claude --dangerously-skip-permissions
 ```
 
 Or without the shell aliases:
 
 ```bash
 # Terminal 1
-devcontainer exec --workspace-folder . firebase emulators:start --only firestore --project=demo-azadi
+devcontainer exec --workspace-folder . gcloud emulators firestore start --host-port=0.0.0.0:8081 --database-mode=datastore-mode --project=demo-azadi
 
 # Terminal 2
 devcontainer exec --workspace-folder . bash -c "cd /workspace/frontend && npm run dev"
