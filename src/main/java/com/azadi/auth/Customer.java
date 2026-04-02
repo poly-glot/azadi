@@ -16,6 +16,7 @@ public class Customer {
     private LocalDate dob;
     private String postcode;
     private String phone;
+    private String mobilePhone;
     private String addressLine1;
     private String addressLine2;
     private String city;
@@ -74,6 +75,14 @@ public class Customer {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getMobilePhone() {
+        return mobilePhone;
+    }
+
+    public void setMobilePhone(String mobilePhone) {
+        this.mobilePhone = mobilePhone;
     }
 
     public String getAddressLine1() {
