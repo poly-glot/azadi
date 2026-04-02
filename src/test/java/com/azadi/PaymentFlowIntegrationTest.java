@@ -82,13 +82,13 @@ class PaymentFlowIntegrationTest extends BaseIntegrationTest {
 
         // Act
         ResponseEntity<String> response = restTemplate.exchange(
-                "/api/webhooks/stripe",
+                "/api/stripe/webhook",
                 HttpMethod.POST,
                 new HttpEntity<>(webhookPayload, headers),
                 String.class);
 
-        // Assert - webhook endpoint should accept the request
-        // Note: with mock Stripe, signature verification may be bypassed in test
+        // Assert - webhook endpoint should accept the request (400 expected due to
+        // signature verification against mock Stripe, which is correct security behavior)
         assertThat(response.getStatusCode().value()).isIn(200, 400);
     }
 }

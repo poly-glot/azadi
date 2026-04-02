@@ -3,9 +3,7 @@ package com.azadi;
 import com.azadi.auth.LoginAttemptTracker;
 import com.azadi.config.RateLimitFilter;
 import com.google.cloud.datastore.Datastore;
-import com.google.cloud.datastore.Entity;
-import com.google.cloud.datastore.Key;
-import com.google.cloud.datastore.KeyFactory;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,15 +17,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.google.cloud.Timestamp;
+import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.Key;
+import com.google.cloud.datastore.KeyFactory;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -80,7 +79,6 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected Datastore datastore;
 
-
     @Autowired
     private RateLimitFilter rateLimitFilter;
 
@@ -89,7 +87,6 @@ public abstract class BaseIntegrationTest {
 
     @BeforeEach
     void clearDatastore() {
-        // Clean known kinds between tests to ensure isolation
         cleanKind("Customer");
         cleanKind("Agreement");
         cleanKind("Payment");
@@ -97,7 +94,6 @@ public abstract class BaseIntegrationTest {
         cleanKind("AuditEvent");
         cleanKind("Settlement");
 
-        // Reset in-memory state to prevent cross-test contamination
         rateLimitFilter.clearAll();
         loginAttemptTracker.clearAll();
     }
@@ -112,14 +108,6 @@ public abstract class BaseIntegrationTest {
         }
     }
 
-    /**
-     * Inserts a test customer entity into the Datastore emulator.
-     *
-     * @param dob             date of birth
-     * @param postcode        UK postcode
-     * @param agreementNumber the finance agreement number
-     * @return the generated customer ID
-     */
     protected long createTestCustomer(LocalDate dob, String postcode, String agreementNumber) {
         KeyFactory customerKeyFactory = datastore.newKeyFactory().setKind("Customer");
         Key customerKey = datastore.allocateId(customerKeyFactory.newKey());
@@ -138,7 +126,6 @@ public abstract class BaseIntegrationTest {
                 .build();
         datastore.put(customer);
 
-        // Also create a corresponding agreement entity
         KeyFactory agreementKeyFactory = datastore.newKeyFactory().setKind("Agreement");
         Key agreementKey = datastore.allocateId(agreementKeyFactory.newKey());
 
@@ -168,105 +155,52 @@ public abstract class BaseIntegrationTest {
         return customerKey.getId();
     }
 
-    /**
-     * Performs a login via the TestRestTemplate and returns the session cookie
-     * for subsequent authenticated requests.
-     *
-     * @param agreementNumber the agreement number to log in with
-     * @param dob             date of birth
-     * @param postcode        postcode
-     * @return the Set-Cookie header value containing the session ID
-     */
     protected String loginAs(String agreementNumber, LocalDate dob, String postcode) {
-        try {
-            String baseUrl = "http://localhost:" + port;
+        ResponseEntity<String> loginPage = restTemplate.getForEntity("/login", String.class);
+        String csrfToken = extractCsrfToken(loginPage.getBody());
+        String sessionCookie = extractSessionCookie(loginPage);
 
-            // 1. GET /login to obtain CSRF token and session cookie
-            var loginUrl = new java.net.URL(baseUrl + "/login");
-            var loginConn = (java.net.HttpURLConnection) loginUrl.openConnection();
-            loginConn.setInstanceFollowRedirects(false);
-            loginConn.connect();
-            String body = new String(loginConn.getInputStream().readAllBytes());
-            String csrfToken = extractCsrfToken(body);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set(HttpHeaders.COOKIE, sessionCookie);
 
-            // Extract all cookies from the GET response
-            String allCookies = "";
-            var cookieHeaders = loginConn.getHeaderFields().get("Set-Cookie");
-            if (cookieHeaders != null) {
-                allCookies = String.join("; ",
-                    cookieHeaders.stream().map(c -> c.split(";")[0]).toList());
-            }
-            loginConn.disconnect();
+        String formattedDob = dob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-            // 2. POST /login with credentials (no redirect following)
-            String formattedDob = dob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            String formBody = "username=" + java.net.URLEncoder.encode(agreementNumber, "UTF-8")
-                    + "&password=" + java.net.URLEncoder.encode(formattedDob + "|" + postcode, "UTF-8")
-                    + "&_csrf=" + java.net.URLEncoder.encode(csrfToken != null ? csrfToken : "", "UTF-8");
+        var formData = new LinkedMultiValueMap<String, String>();
+        formData.add("username", agreementNumber);
+        formData.add("password", formattedDob + "|" + postcode);
+        if (csrfToken != null) {
+            formData.add("_csrf", csrfToken);
+        }
 
-            var postUrl = new java.net.URL(baseUrl + "/login");
-            var postConn = (java.net.HttpURLConnection) postUrl.openConnection();
-            postConn.setRequestMethod("POST");
-            postConn.setInstanceFollowRedirects(false);
-            postConn.setDoOutput(true);
-            postConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            postConn.setRequestProperty("Cookie", allCookies);
-            postConn.getOutputStream().write(formBody.getBytes());
-            postConn.getOutputStream().flush();
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "/login", new HttpEntity<>(formData, headers), String.class);
 
-            int status = postConn.getResponseCode();
-
-            // Extract session cookie from 302 response (session fixation migration creates new session)
-            var postCookies = postConn.getHeaderFields().get("Set-Cookie");
-            if (postCookies != null) {
-                for (String cookie : postCookies) {
-                    if (cookie.contains("AZADI_SESSION") || cookie.contains("SESSION")) {
-                        return cookie.split(";")[0];
-                    }
+        List<String> postCookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        if (postCookies != null) {
+            for (String cookie : postCookies) {
+                if (cookie.contains("AZADI_SESSION") || cookie.contains("SESSION")) {
+                    return cookie.split(";")[0];
                 }
             }
-            postConn.disconnect();
-
-            // Fall back to initial cookies
-            return allCookies;
-        } catch (Exception e) {
-            throw new RuntimeException("Login failed", e);
         }
+
+        return sessionCookie;
     }
 
-    /**
-     * Extracts a CSRF token from an HTML page body. Looks for a hidden input field
-     * named _csrf.
-     */
-    private String extractCsrfToken(String html) {
+    protected String extractCsrfToken(String html) {
         if (html == null) {
             return null;
         }
-        // Look for <input type="hidden" name="_csrf" value="..." />
-        int nameIndex = html.indexOf("name=\"_csrf\"");
-        if (nameIndex == -1) {
-            return null;
-        }
-        // Search backward and forward from nameIndex for value attribute
-        int searchStart = Math.max(0, nameIndex - 200);
-        int searchEnd = Math.min(html.length(), nameIndex + 200);
-        String region = html.substring(searchStart, searchEnd);
-
-        int valueIndex = region.indexOf("value=\"");
-        if (valueIndex == -1) {
-            return null;
-        }
-        int valueStart = valueIndex + "value=\"".length();
-        int valueEnd = region.indexOf("\"", valueStart);
-        if (valueEnd == -1) {
-            return null;
-        }
-        return region.substring(valueStart, valueEnd);
+        var el = Jsoup.parse(html).selectFirst("input[name=_csrf]");
+        return el != null ? el.attr("value") : null;
     }
 
-    /**
-     * Creates an authenticated HttpHeaders instance with the given session cookie.
-     */
+    protected String extractSessionCookie(ResponseEntity<String> response) {
+        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        return (cookies != null && !cookies.isEmpty()) ? cookies.getFirst().split(";")[0] : "";
+    }
+
     protected HttpHeaders authenticatedHeaders(String sessionCookie) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, sessionCookie);

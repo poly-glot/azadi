@@ -61,10 +61,10 @@ class DataIsolationIntegrationTest extends BaseIntegrationTest {
                 new HttpEntity<>(headers),
                 String.class);
 
-        // Assert - should be denied (403/404) or not contain Customer B's data
+        // Assert - should be denied or not contain Customer B's data
         // TestRestTemplate follows redirects, so 403 might become 200 with error page
         assertThat(response.getStatusCode().value()).isIn(200, 403, 404);
-        if (response.getStatusCode().value() == 200 && response.getBody() != null) {
+        if (response.getBody() != null) {
             assertThat(response.getBody()).doesNotContain(AGREEMENT_B);
         }
     }
@@ -91,9 +91,9 @@ class DataIsolationIntegrationTest extends BaseIntegrationTest {
                 new HttpEntity<>(formData, headers),
                 String.class);
 
-        // Assert - should be denied (403/404) or not process the request
+        // Assert - should be denied or not process the request
         assertThat(response.getStatusCode().value()).isIn(200, 403, 404);
-        if (response.getStatusCode().value() == 200 && response.getBody() != null) {
+        if (response.getBody() != null) {
             assertThat(response.getBody()).doesNotContain("99-99-99");
         }
     }

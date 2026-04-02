@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -47,11 +48,11 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
 
         // Fetch login page for CSRF
         ResponseEntity<String> loginPage = restTemplate.getForEntity("/login", String.class);
-        String csrfToken = extractCsrfTokenFromHtml(loginPage.getBody());
+        String csrfToken = extractCsrfToken(loginPage.getBody());
         String sessionCookie = extractSessionCookie(loginPage);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set(HttpHeaders.COOKIE, sessionCookie);
 
         String formattedDob = wrongDob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -85,7 +86,6 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
                 "/logout", HttpMethod.POST, new HttpEntity<>(headers), String.class);
 
         // Assert - after logout, accessing /my-account should show login page
-        // (TestRestTemplate follows redirects, so we get the login page with 200)
         ResponseEntity<String> protectedResponse = restTemplate.exchange(
                 "/my-account", HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
@@ -102,25 +102,5 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
         // Assert - should end up on the login page
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("login");
-    }
-
-    private String extractCsrfTokenFromHtml(String html) {
-        if (html == null) return null;
-        int idx = html.indexOf("name=\"_csrf\"");
-        if (idx == -1) return null;
-        int start = Math.max(0, idx - 200);
-        int end = Math.min(html.length(), idx + 200);
-        String region = html.substring(start, end);
-        int valueIdx = region.indexOf("value=\"");
-        if (valueIdx == -1) return null;
-        int valueStart = valueIdx + "value=\"".length();
-        int valueEnd = region.indexOf("\"", valueStart);
-        if (valueEnd == -1) return null;
-        return region.substring(valueStart, valueEnd);
-    }
-
-    private String extractSessionCookie(ResponseEntity<String> response) {
-        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        return (cookies != null && !cookies.isEmpty()) ? cookies.getFirst() : "";
     }
 }
