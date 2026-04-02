@@ -23,13 +23,11 @@ public class AgreementController {
     @GetMapping("/my-account")
     public String myAccount(Model model) {
         var customerId = authorizationService.getCurrentCustomerId();
-        var customerName = authorizationService.getCurrentCustomerName();
         var agreements = agreementService.getAgreementsForCustomer(customerId)
             .stream()
             .map(AgreementResponse::from)
             .toList();
 
-        model.addAttribute("customerName", customerName);
         model.addAttribute("agreements", agreements);
         return "my-account";
     }
