@@ -2,6 +2,8 @@ package com.azadi.payment;
 
 import com.azadi.audit.AuditService;
 import com.azadi.auth.AuthorizationService;
+import com.azadi.auth.Customer;
+import com.azadi.auth.CustomerRepository;
 import com.azadi.email.EmailService;
 import com.stripe.model.PaymentIntent;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +43,9 @@ class PaymentServiceTest {
     @Mock
     private AuthorizationService authorizationService;
 
+    @Mock
+    private CustomerRepository customerRepository;
+
     private PaymentService paymentService;
 
     private static final String CUSTOMER_ID = "CUST-001";
@@ -51,14 +56,16 @@ class PaymentServiceTest {
     void setUp() {
         paymentService = new PaymentService(
             stripePaymentService, paymentRepository, emailService,
-            auditService, authorizationService);
+            auditService, authorizationService, customerRepository);
     }
 
     @Test
     @DisplayName("initiatePayment creates Stripe intent and saves payment record")
     void initiatePaymentCreatesIntentAndSaves() throws Exception {
         // Arrange
-        when(authorizationService.getCurrentCustomerId()).thenReturn(CUSTOMER_ID);
+        var customer = new Customer();
+        customer.setEmail("test@test.com");
+        when(customerRepository.findByCustomerId(CUSTOMER_ID)).thenReturn(Optional.of(customer));
         var mockIntent = mock(PaymentIntent.class);
         when(mockIntent.getId()).thenReturn("pi_test_123");
         when(stripePaymentService.createPaymentIntent(AMOUNT_PENCE, AGREEMENT_NUMBER, "test@test.com"))
@@ -68,7 +75,7 @@ class PaymentServiceTest {
 
         // Act
         var result = paymentService.initiatePayment(
-            AMOUNT_PENCE, 1L, AGREEMENT_NUMBER, "test@test.com", "127.0.0.1");
+            AMOUNT_PENCE, 1L, AGREEMENT_NUMBER, CUSTOMER_ID, "127.0.0.1");
 
         // Assert
         assertThat(result.getId()).isEqualTo("pi_test_123");

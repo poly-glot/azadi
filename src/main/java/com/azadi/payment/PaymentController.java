@@ -69,7 +69,7 @@ public class PaymentController {
                 request.amountPence(),
                 agreement.getId(),
                 agreement.getAgreementNumber(),
-                "", // email resolved from customer record
+                customerId,
                 ipAddress
             );
 

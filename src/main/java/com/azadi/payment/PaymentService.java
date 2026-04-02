@@ -2,6 +2,7 @@ package com.azadi.payment;
 
 import com.azadi.audit.AuditService;
 import com.azadi.auth.AuthorizationService;
+import com.azadi.auth.CustomerRepository;
 import com.azadi.email.EmailService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
@@ -22,24 +23,30 @@ public class PaymentService {
     private final EmailService emailService;
     private final AuditService auditService;
     private final AuthorizationService authorizationService;
+    private final CustomerRepository customerRepository;
 
     public PaymentService(StripePaymentService stripePaymentService,
                           PaymentRepository paymentRepository,
                           EmailService emailService,
                           AuditService auditService,
-                          AuthorizationService authorizationService) {
+                          AuthorizationService authorizationService,
+                          CustomerRepository customerRepository) {
         this.stripePaymentService = stripePaymentService;
         this.paymentRepository = paymentRepository;
         this.emailService = emailService;
         this.auditService = auditService;
         this.authorizationService = authorizationService;
+        this.customerRepository = customerRepository;
     }
 
     public PaymentIntent initiatePayment(long amountPence, Long agreementId,
-                                         String agreementNumber, String customerEmail,
+                                         String agreementNumber, String customerId,
                                          String ipAddress) throws StripeException {
-        var customerId = authorizationService.getCurrentCustomerId();
-        var paymentIntent = stripePaymentService.createPaymentIntent(amountPence, agreementNumber, customerEmail);
+        var customerEmail = customerRepository.findByCustomerId(customerId)
+            .map(c -> c.getEmail() != null ? c.getEmail() : "")
+            .orElse("");
+        var paymentIntent = stripePaymentService.createPaymentIntent(
+            amountPence, agreementNumber, customerEmail);
 
         var record = new PaymentRecord();
         record.setAgreementId(agreementId);
