@@ -81,4 +81,11 @@ public class Document {
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getFileType() {
+        if (fileName != null && fileName.contains(".")) {
+            return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+        }
+        return "pdf";
+    }
 }

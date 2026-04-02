@@ -12,28 +12,26 @@
   <h1 class="u-site-heading">My Documents</h1>
 
   <div class="c-documents">
-    <div th:if="${documents == null or documents.empty}" class="u-margin-vertical">
+    <div th:if="${documents != null and documents.empty}" class="u-margin-vertical">
       <p class="u-note">You have no documents available at this time.</p>
     </div>
 
-    <a th:each="doc : ${documents}"
-       th:href="@{/documents/{id}(id=${doc.id})}"
-       class="c-documents__item"
-       th:classappend="${doc.unread} ? 'c-documents__item--new' : ''">
+    <a th:if="${documents != null}" th:each="doc : ${documents}"
+       th:href="@{/documents/{id}/download(id=${doc.id})}"
+       class="c-documents__item">
       <div class="c-documents__icon">
-        <img th:src="@{/assets/img/file-icons/{type}.png(type=${doc.fileType ?: 'pdf'})}"
+        <img th:src="@{/assets/img/file-icons/{type}.png(type=${doc.fileType})}"
              th:alt="${doc.fileName}" width="32" height="32">
       </div>
       <div class="c-documents__label">
         <span th:text="${doc.fileName}">Finance_Agreement.pdf</span>
-        <span th:if="${doc.unread}" class="c-documents__sticker">New</span>
       </div>
       <div class="c-documents__indicator">
         <span>Download</span>
       </div>
     </a>
 
-    <!--/* Static fallback for when no model data */-->
+    <!--/* Static fallback for when no model data (dev preview) */-->
     <th:block th:if="${documents == null}">
       <a href="#" class="c-documents__item c-documents__item--new">
         <div class="c-documents__icon">
