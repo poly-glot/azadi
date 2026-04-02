@@ -20,54 +20,32 @@
         <Package name="com.azadi.seed"/>
     </Match>
 
-    <!-- Mutable fields exposed via getters in entities - expected for Datastore -->
+    <!-- Mutable fields exposed via getters in Datastore entities - required by SDK -->
     <Match>
         <Bug pattern="EI_EXPOSE_REP"/>
         <Or>
-            <Class name="~.*Response"/>
-            <Class name="~.*Request"/>
-            <Class name="~.*Controller"/>
-            <Class name="~.*Service"/>
-            <Class name="~.*Repository"/>
-            <Class name="~.*Agreement"/>
-            <Class name="~.*Customer"/>
-            <Class name="~.*PaymentRecord"/>
-            <Class name="~.*BankDetails"/>
-            <Class name="~.*Document"/>
-            <Class name="~.*AuditEvent"/>
-            <Class name="~.*SettlementFigure"/>
-            <Class name="~.*StatementRequest"/>
-            <Class name="~.*SeedMarker"/>
+            <Class name="com.azadi.agreement.Agreement"/>
+            <Class name="com.azadi.auth.Customer"/>
+            <Class name="com.azadi.payment.PaymentRecord"/>
+            <Class name="com.azadi.bank.BankDetails"/>
+            <Class name="com.azadi.document.Document"/>
+            <Class name="com.azadi.audit.AuditEvent"/>
+            <Class name="com.azadi.settlement.SettlementFigure"/>
+            <Class name="com.azadi.statement.StatementRequest"/>
         </Or>
     </Match>
 
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
         <Or>
-            <Class name="~.*Response"/>
-            <Class name="~.*Request"/>
-            <Class name="~.*Controller"/>
-            <Class name="~.*Service"/>
-            <Class name="~.*Repository"/>
-            <Class name="~.*Agreement"/>
-            <Class name="~.*Customer"/>
-            <Class name="~.*PaymentRecord"/>
-            <Class name="~.*BankDetails"/>
-            <Class name="~.*Document"/>
-            <Class name="~.*AuditEvent"/>
-            <Class name="~.*SettlementFigure"/>
-            <Class name="~.*StatementRequest"/>
-        </Or>
-    </Match>
-
-    <!-- Null checks handled by Spring Security / Spring Data -->
-    <Match>
-        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
-        <Or>
-            <Class name="~.*Config"/>
-            <Class name="~.*Repository"/>
-            <Class name="~.*Service"/>
-            <Class name="~.*Controller"/>
+            <Class name="com.azadi.agreement.Agreement"/>
+            <Class name="com.azadi.auth.Customer"/>
+            <Class name="com.azadi.payment.PaymentRecord"/>
+            <Class name="com.azadi.bank.BankDetails"/>
+            <Class name="com.azadi.document.Document"/>
+            <Class name="com.azadi.audit.AuditEvent"/>
+            <Class name="com.azadi.settlement.SettlementFigure"/>
+            <Class name="com.azadi.statement.StatementRequest"/>
         </Or>
     </Match>
 
@@ -79,13 +57,10 @@
         <Bug pattern="SE_NO_SERIALVERSIONID"/>
     </Match>
 
-    <!-- Unconfirmed casts - Spring handles type safety -->
+    <!-- Unconfirmed casts in webhook handler - Stripe SDK types -->
     <Match>
         <Bug pattern="BC_UNCONFIRMED_CAST"/>
-        <Or>
-            <Class name="~.*Controller"/>
-            <Class name="~.*Service"/>
-        </Or>
+        <Class name="com.azadi.payment.PaymentController"/>
     </Match>
 
     <!-- Spring CGLIB proxies -->

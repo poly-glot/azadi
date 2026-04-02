@@ -35,7 +35,7 @@ public class SecurityConfig {
             .authenticationProvider(azadiAuthenticationProvider)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/login-error", "/assets/**",
-                    "/actuator/health", "/api/stripe/webhook").permitAll()
+                    "/actuator/health", "/api/stripe/webhook", "/api/csp-report").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
