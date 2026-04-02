@@ -17,7 +17,6 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/anthropics/devcontainer-features/claude-code:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/dhoeric/features/google-cloud-cli:1": {},
     "ghcr.io/devcontainers/features/java:1": {
       "version": "21",
       "installGradle": false,
@@ -25,20 +24,17 @@
     }
   },
 
-  "forwardPorts": [8080, 3000, 4000, 8081, 9099],
+  "forwardPorts": [8080, 3000, 4000, 5173, 8081, 9099],
   "portsAttributes": {
     "8080": { "label": "Spring Boot", "onAutoForward": "notify" },
     "3000": { "label": "Mock Server", "onAutoForward": "notify" },
     "4000": { "label": "Firebase UI", "onAutoForward": "notify" },
+    "5173": { "label": "Vite Dev Server", "onAutoForward": "notify" },
     "8081": { "label": "Firestore", "onAutoForward": "silent" },
     "9099": { "label": "Auth Emulator", "onAutoForward": "silent" }
   },
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
-
-  "mounts": [
-    "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,readonly"
-  ],
 
   "containerEnv": {
     "FIRESTORE_EMULATOR_HOST": "0.0.0.0:8081"

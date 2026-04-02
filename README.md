@@ -121,31 +121,32 @@ The dev container provides Java 21, Node 22, Maven, Firebase CLI, and all depend
 Open three terminals:
 
 ```bash
+devcontainer up --workspace-folder .
+
 # Terminal 1: Firestore emulator
-fb-emulator
+devcontainer exec --workspace-folder . zsh -ic fb-emulator
 
 # Terminal 2: Vite dev server (CSS/JS with HMR)
-dev-frontend
+devcontainer exec --workspace-folder . zsh -ic dev-frontend
 
 # Terminal 3: Spring Boot (Thymeleaf + API)
-dev
+devcontainer exec --workspace-folder . zsh -ic dev
+
+# Claude Code
+devcontainer exec --workspace-folder . zsh -ic claude
 ```
 
 Or without the shell aliases:
 
 ```bash
 # Terminal 1
-gcloud emulators firestore start --host-port=0.0.0.0:8081 --database-mode=datastore-mode --project=demo-azadi
+devcontainer exec --workspace-folder . firebase emulators:start --only firestore --project=demo-azadi
 
 # Terminal 2
-cd frontend && npm run dev
+devcontainer exec --workspace-folder . bash -c "cd /workspace/frontend && npm run dev"
 
 # Terminal 3
-set -a && source local.env && set +a
-FIRESTORE_EMULATOR_HOST=localhost:8081 \
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev \
-  "-Dspring-boot.run.jvmArguments=--add-opens java.base/java.math=ALL-UNNAMED" \
-  -P no-checks
+devcontainer exec --workspace-folder . bash -c "cd /workspace && set -a && source local.env && set +a && FIRESTORE_EMULATOR_HOST=localhost:8081 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev \"-Dspring-boot.run.jvmArguments=--add-opens java.base/java.math=ALL-UNNAMED\" -P no-checks"
 ```
 
 `local.env` contains test Stripe keys and encryption secrets needed to start the app. The `dev` alias sources it automatically.

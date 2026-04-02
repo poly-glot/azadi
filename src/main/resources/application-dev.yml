@@ -12,6 +12,8 @@ spring:
       quiet-period: 400ms
   cloud:
     gcp:
+      secretmanager:
+        enabled: false
       datastore:
         emulator:
           enabled: true

@@ -44,7 +44,7 @@ alias claude="claude --dangerously-skip-permissions"
 # Azadi dev aliases
 alias dev='cd /workspace && set -a && source local.env && set +a && FIRESTORE_EMULATOR_HOST=localhost:8081 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev "-Dspring-boot.run.jvmArguments=--add-opens java.base/java.math=ALL-UNNAMED" -P no-checks'
 alias dev-frontend="cd /workspace/frontend && npm run dev"
-alias fb-emulator="gcloud emulators firestore start --host-port=0.0.0.0:8081 --database-mode=datastore-mode --project=demo-azadi"
+alias fb-emulator="cd /workspace && firebase emulators:start --only firestore --project=demo-azadi"
 alias fb-emulator-reset="kill \$(lsof -ti:8081) 2>/dev/null; sleep 1; fb-emulator"
 alias test-unit="cd /workspace && ./mvnw test -P no-checks"
 alias test-all="cd /workspace && ./mvnw verify -P no-checks"

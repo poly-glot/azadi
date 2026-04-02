@@ -5,6 +5,7 @@ export default defineConfig({
   root: 'src',
   server: {
     port: 5173,
+    host: '0.0.0.0',
     // Allow Spring Boot at :8080 to load assets from Vite
     cors: true,
     // Serve images from src/img/ at /img/* for Vite dev
