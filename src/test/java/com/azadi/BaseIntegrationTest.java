@@ -196,9 +196,26 @@ public abstract class BaseIntegrationTest {
         return el != null ? el.attr("value") : null;
     }
 
+    protected String extractCsrf(ResponseEntity<String> response) {
+        return extractCsrfToken(response.getBody());
+    }
+
     protected String extractSessionCookie(ResponseEntity<String> response) {
         var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
         return (cookies != null && !cookies.isEmpty()) ? cookies.getFirst().split(";")[0] : "";
+    }
+
+    protected String buildCookieHeader(ResponseEntity<String> response, String sessionCookie) {
+        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        if (cookies != null && !cookies.isEmpty()) {
+            var newSession = cookies.stream()
+                .filter(c -> c.contains("AZADI_SESSION") || c.contains("SESSION"))
+                .map(c -> c.split(";")[0])
+                .findFirst()
+                .orElse(sessionCookie);
+            return newSession;
+        }
+        return sessionCookie;
     }
 
     protected HttpHeaders authenticatedHeaders(String sessionCookie) {
