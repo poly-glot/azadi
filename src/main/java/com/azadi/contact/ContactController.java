@@ -1,12 +1,14 @@
 package com.azadi.contact;
 
 import com.azadi.auth.AuthorizationService;
+import com.azadi.contact.dto.UpdateContactDetailsRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -30,17 +32,13 @@ public class ContactController {
     }
 
     @PostMapping("/my-contact-details")
-    public String updateContactDetails(@RequestParam String phone,
-                                       @RequestParam String email,
-                                       @RequestParam String addressLine1,
-                                       @RequestParam(required = false) String addressLine2,
-                                       @RequestParam String city,
-                                       @RequestParam String postcode,
-                                       HttpServletRequest request,
+    public String updateContactDetails(@Valid @ModelAttribute UpdateContactDetailsRequest request,
+                                       HttpServletRequest httpRequest,
                                        RedirectAttributes redirectAttributes) {
         var customerId = authorizationService.getCurrentCustomerId();
-        contactService.updateContactDetails(customerId, phone, email, addressLine1,
-            addressLine2, city, postcode, request.getRemoteAddr());
+        contactService.updateContactDetails(customerId, request.phone(), request.email(),
+            request.addressLine1(), request.addressLine2(), request.city(),
+            request.postcode(), httpRequest.getRemoteAddr());
         redirectAttributes.addFlashAttribute("success", "Contact details updated successfully.");
         return "redirect:/my-contact-details";
     }
