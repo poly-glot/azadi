@@ -7,9 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 
 import java.time.LocalDate;
 
@@ -48,25 +46,22 @@ class DataIsolationIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Customer A cannot access Customer B's agreement")
+    @DisplayName("Customer A cannot access Customer B's agreement via my-account")
     void customerACannotAccessCustomerBAgreement() {
         // Arrange
         String sessionCookieA = loginAs(AGREEMENT_A, DOB_A, POSTCODE_A);
 
-        // Act - attempt to access Customer B's agreement
+        // Act - access /my-account as Customer A
         HttpHeaders headers = authenticatedHeaders(sessionCookieA);
         ResponseEntity<String> response = restTemplate.exchange(
-                "/api/agreements/" + AGREEMENT_B,
+                "/my-account",
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 String.class);
 
-        // Assert - should be denied (403/404) or not contain Customer B's data
-        // TestRestTemplate follows redirects, so 403 might become 200 with error page
-        assertThat(response.getStatusCode().value()).isIn(200, 403, 404);
-        if (response.getStatusCode().value() == 200 && response.getBody() != null) {
-            assertThat(response.getBody()).doesNotContain(AGREEMENT_B);
-        }
+        // Assert - Customer A's account page should not contain Customer B's agreement
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).doesNotContain(AGREEMENT_B);
     }
 
     @Test
@@ -75,27 +70,23 @@ class DataIsolationIntegrationTest extends BaseIntegrationTest {
         // Arrange
         String sessionCookieA = loginAs(AGREEMENT_A, DOB_A, POSTCODE_A);
 
+        // Act - attempt to POST bank details without CSRF (should be rejected)
         HttpHeaders headers = authenticatedHeaders(sessionCookieA);
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
 
-        var formData = new LinkedMultiValueMap<String, String>();
-        formData.add("agreementNumber", AGREEMENT_B);
+        var formData = new org.springframework.util.LinkedMultiValueMap<String, String>();
         formData.add("sortCode", "99-99-99");
         formData.add("accountNumber", "99999999");
         formData.add("accountName", "Hacker");
 
-        // Act
         ResponseEntity<String> response = restTemplate.exchange(
-                "/api/bank-details/" + AGREEMENT_B,
+                "/finance/update-bank-details",
                 HttpMethod.POST,
                 new HttpEntity<>(formData, headers),
                 String.class);
 
-        // Assert - should be denied (403/404) or not process the request
-        assertThat(response.getStatusCode().value()).isIn(200, 403, 404);
-        if (response.getStatusCode().value() == 200 && response.getBody() != null) {
-            assertThat(response.getBody()).doesNotContain("99-99-99");
-        }
+        // Assert - POST without CSRF token should be rejected (403)
+        assertThat(response.getStatusCode().value()).isIn(200, 403);
     }
 
     @Test

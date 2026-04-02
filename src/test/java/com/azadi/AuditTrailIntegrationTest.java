@@ -3,7 +3,6 @@ package com.azadi;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
-import com.google.cloud.datastore.StructuredQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,9 +32,10 @@ class AuditTrailIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Successful login does not create audit event (login auditing not implemented)")
-    void loginDoesNotCreateAuditEvent() {
+    void loginDoesNotCreateAuditEvent() throws InterruptedException {
         // Act
         loginAs(AGREEMENT_NUMBER, DOB, POSTCODE);
+        Thread.sleep(500);
 
         // Assert - login auditing is not yet implemented
         List<Entity> auditEvents = queryAuditEvents();
@@ -44,13 +44,14 @@ class AuditTrailIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Viewing account page does not create audit event (not implemented)")
-    void viewAgreementDoesNotCreateAuditEvent() {
+    void viewAgreementDoesNotCreateAuditEvent() throws InterruptedException {
         // Arrange
         String sessionCookie = loginAs(AGREEMENT_NUMBER, DOB, POSTCODE);
 
         // Act - access the account page
         HttpHeaders headers = authenticatedHeaders(sessionCookie);
         restTemplate.exchange("/my-account", HttpMethod.GET, new HttpEntity<>(headers), String.class);
+        Thread.sleep(500);
 
         // Assert - agreement view auditing is not yet implemented
         List<Entity> auditEvents = queryAuditEvents();
@@ -61,11 +62,21 @@ class AuditTrailIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Contact details update creates CONTACT_DETAILS_UPDATED audit event")
-    void contactUpdateCreatesAuditEvent() {
+    void contactUpdateCreatesAuditEvent() throws InterruptedException {
         // Arrange
         String sessionCookie = loginAs(AGREEMENT_NUMBER, DOB, POSTCODE);
 
-        HttpHeaders headers = authenticatedHeaders(sessionCookie);
+        // GET the contact details page to extract CSRF token
+        HttpHeaders getHeaders = authenticatedHeaders(sessionCookie);
+        ResponseEntity<String> formPage = restTemplate.exchange(
+                "/my-contact-details", HttpMethod.GET,
+                new HttpEntity<>(getHeaders), String.class);
+
+        String csrfToken = extractCsrf(formPage);
+        String cookieHeader = buildCookieHeader(formPage, sessionCookie);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, cookieHeader);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         var formData = new LinkedMultiValueMap<String, String>();
@@ -74,13 +85,22 @@ class AuditTrailIntegrationTest extends BaseIntegrationTest {
         formData.add("addressLine1", "1 Test Lane");
         formData.add("city", "London");
         formData.add("postcode", "EH1 1YZ");
+        if (csrfToken != null) {
+            formData.add("_csrf", csrfToken);
+        }
 
         // Act
-        restTemplate.exchange(
+        ResponseEntity<String> postResponse = restTemplate.exchange(
                 "/my-contact-details",
                 HttpMethod.POST,
                 new HttpEntity<>(formData, headers),
                 String.class);
+
+        // Ensure the POST was accepted
+        assertThat(postResponse.getStatusCode().value()).isIn(200, 302);
+
+        // Wait for async audit write
+        Thread.sleep(2000);
 
         // Assert
         List<Entity> auditEvents = queryAuditEvents();
@@ -93,11 +113,21 @@ class AuditTrailIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Audit events contain required fields")
-    void auditEventsContainRequiredFields() {
+    void auditEventsContainRequiredFields() throws InterruptedException {
         // Arrange - trigger an audit event via contact update
         String sessionCookie = loginAs(AGREEMENT_NUMBER, DOB, POSTCODE);
 
-        HttpHeaders headers = authenticatedHeaders(sessionCookie);
+        // GET the contact details page to extract CSRF token
+        HttpHeaders getHeaders = authenticatedHeaders(sessionCookie);
+        ResponseEntity<String> formPage = restTemplate.exchange(
+                "/my-contact-details", HttpMethod.GET,
+                new HttpEntity<>(getHeaders), String.class);
+
+        String csrfToken = extractCsrf(formPage);
+        String cookieHeader = buildCookieHeader(formPage, sessionCookie);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.COOKIE, cookieHeader);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         var formData = new LinkedMultiValueMap<String, String>();
@@ -106,12 +136,21 @@ class AuditTrailIntegrationTest extends BaseIntegrationTest {
         formData.add("addressLine1", "2 Test Lane");
         formData.add("city", "London");
         formData.add("postcode", "EH1 1YZ");
+        if (csrfToken != null) {
+            formData.add("_csrf", csrfToken);
+        }
 
-        restTemplate.exchange(
+        ResponseEntity<String> postResponse = restTemplate.exchange(
                 "/my-contact-details",
                 HttpMethod.POST,
                 new HttpEntity<>(formData, headers),
                 String.class);
+
+        // Ensure the POST was accepted
+        assertThat(postResponse.getStatusCode().value()).isIn(200, 302);
+
+        // Wait for async audit write
+        Thread.sleep(2000);
 
         // Assert
         List<Entity> auditEvents = queryAuditEvents();

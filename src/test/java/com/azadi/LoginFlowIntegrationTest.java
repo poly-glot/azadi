@@ -47,12 +47,12 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
 
         // Fetch login page for CSRF
         ResponseEntity<String> loginPage = restTemplate.getForEntity("/login", String.class);
-        String csrfToken = extractCsrfTokenFromHtml(loginPage.getBody());
-        String sessionCookie = extractSessionCookie(loginPage);
+        String csrfToken = extractCsrf(loginPage);
+        String cookies = buildCookieHeader(loginPage, "");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set(HttpHeaders.COOKIE, sessionCookie);
+        headers.set(HttpHeaders.COOKIE, cookies);
 
         String formattedDob = wrongDob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -79,15 +79,31 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
         // Arrange - login first
         String sessionCookie = loginAs(AGREEMENT_NUMBER, DOB, POSTCODE);
 
-        // Act - logout
-        HttpHeaders headers = authenticatedHeaders(sessionCookie);
-        restTemplate.exchange(
-                "/logout", HttpMethod.POST, new HttpEntity<>(headers), String.class);
+        // GET a page with a form to extract the CSRF token for the logout POST
+        HttpHeaders getHeaders = authenticatedHeaders(sessionCookie);
+        ResponseEntity<String> page = restTemplate.exchange(
+                "/my-contact-details", HttpMethod.GET, new HttpEntity<>(getHeaders), String.class);
 
-        // Assert - after logout, accessing /my-account should show login page
-        // (TestRestTemplate follows redirects, so we get the login page with 200)
+        String csrfToken = extractCsrf(page);
+        String cookieHeader = buildCookieHeader(page, sessionCookie);
+
+        // Act - logout with CSRF token
+        HttpHeaders logoutHeaders = new HttpHeaders();
+        logoutHeaders.set(HttpHeaders.COOKIE, cookieHeader);
+        logoutHeaders.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
+
+        var logoutForm = new org.springframework.util.LinkedMultiValueMap<String, String>();
+        if (csrfToken != null) {
+            logoutForm.add("_csrf", csrfToken);
+        }
+
+        restTemplate.exchange(
+                "/logout", HttpMethod.POST,
+                new HttpEntity<>(logoutForm, logoutHeaders), String.class);
+
+        // Assert - after logout, accessing /my-account with old session should show login page
         ResponseEntity<String> protectedResponse = restTemplate.exchange(
-                "/my-account", HttpMethod.GET, new HttpEntity<>(headers), String.class);
+                "/my-account", HttpMethod.GET, new HttpEntity<>(getHeaders), String.class);
 
         assertThat(protectedResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(protectedResponse.getBody()).contains("login");
@@ -102,25 +118,5 @@ class LoginFlowIntegrationTest extends BaseIntegrationTest {
         // Assert - should end up on the login page
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("login");
-    }
-
-    private String extractCsrfTokenFromHtml(String html) {
-        if (html == null) return null;
-        int idx = html.indexOf("name=\"_csrf\"");
-        if (idx == -1) return null;
-        int start = Math.max(0, idx - 200);
-        int end = Math.min(html.length(), idx + 200);
-        String region = html.substring(start, end);
-        int valueIdx = region.indexOf("value=\"");
-        if (valueIdx == -1) return null;
-        int valueStart = valueIdx + "value=\"".length();
-        int valueEnd = region.indexOf("\"", valueStart);
-        if (valueEnd == -1) return null;
-        return region.substring(valueStart, valueEnd);
-    }
-
-    private String extractSessionCookie(ResponseEntity<String> response) {
-        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        return (cookies != null && !cookies.isEmpty()) ? cookies.getFirst() : "";
     }
 }

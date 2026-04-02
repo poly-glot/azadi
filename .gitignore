@@ -11,3 +11,5 @@ local.env
 .env
 .firebase/
 .firebaserc.local
+.claude/worktrees/
+.DS_Store

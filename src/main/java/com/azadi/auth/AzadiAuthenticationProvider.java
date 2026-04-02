@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class AzadiAuthenticationProvider implements AuthenticationProvider {
@@ -52,7 +53,7 @@ public class AzadiAuthenticationProvider implements AuthenticationProvider {
             dob = LocalDate.parse(dobString, DOB_FORMAT);
         } catch (DateTimeParseException e) {
             loginAttemptTracker.recordFailure(agreementNumber);
-            throw new BadCredentialsException("Invalid date of birth format.");
+            throw new BadCredentialsException("Invalid date of birth format.", e);
         }
 
         var agreements = datastoreTemplate.findAll(Agreement.class);
@@ -79,8 +80,8 @@ public class AzadiAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Invalid agreement number, date of birth, or postcode.");
         }
 
-        var normalizedInputPostcode = postcode.replaceAll("\\s+", "").toUpperCase();
-        var normalizedStoredPostcode = customer.getPostcode().replaceAll("\\s+", "").toUpperCase();
+        var normalizedInputPostcode = postcode.replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
+        var normalizedStoredPostcode = customer.getPostcode().replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
 
         if (!dob.equals(customer.getDob()) || !normalizedInputPostcode.equals(normalizedStoredPostcode)) {
             loginAttemptTracker.recordFailure(agreementNumber);

@@ -57,6 +57,16 @@
             <Class name="~.*AuditEvent"/>
             <Class name="~.*SettlementFigure"/>
             <Class name="~.*StatementRequest"/>
+            <Class name="~.*AuthenticationProvider"/>
+        </Or>
+    </Match>
+
+    <!-- Email templates use \n intentionally for HTML content, not platform line separators -->
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+        <Or>
+            <Package name="com.azadi.email"/>
+            <Package name="com.azadi.email.templates"/>
         </Or>
     </Match>
 

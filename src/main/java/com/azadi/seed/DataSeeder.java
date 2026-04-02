@@ -57,7 +57,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCustomer1() {
-        var customer = createCustomer("CUST-001", "James Wilson", "james.wilson@email.com",
+        createCustomer("CUST-001", "James Wilson", "james.wilson@email.com",
             LocalDate.of(1985, 3, 15), "SW1A 1AA", "07700 900001",
             "10 Downing Street", null, "London");
 
@@ -75,7 +75,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCustomer2() {
-        var customer = createCustomer("CUST-002", "Sarah Thompson", "sarah.thompson@email.com",
+        createCustomer("CUST-002", "Sarah Thompson", "sarah.thompson@email.com",
             LocalDate.of(1990, 7, 22), "M1 1AE", "07700 900002",
             "1 Piccadilly", "City Centre", "Manchester");
 
@@ -93,7 +93,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCustomer3() {
-        var customer = createCustomer("CUST-003", "David Patel", "david.patel@email.com",
+        createCustomer("CUST-003", "David Patel", "david.patel@email.com",
             LocalDate.of(1978, 11, 3), "B1 1BB", "07700 900003",
             "1 Victoria Square", null, "Birmingham");
 
@@ -111,7 +111,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCustomer4() {
-        var customer = createCustomer("CUST-004", "Emma Roberts", "emma.roberts@email.com",
+        createCustomer("CUST-004", "Emma Roberts", "emma.roberts@email.com",
             LocalDate.of(1992, 1, 28), "LS1 1BA", "07700 900004",
             "1 City Square", null, "Leeds");
 
@@ -129,7 +129,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedCustomer5() {
-        var customer = createCustomer("CUST-005", "Michael Chen", "michael.chen@email.com",
+        createCustomer("CUST-005", "Michael Chen", "michael.chen@email.com",
             LocalDate.of(1988, 6, 10), "EH1 1YZ", "07700 900005",
             "1 Princes Street", null, "Edinburgh");
 

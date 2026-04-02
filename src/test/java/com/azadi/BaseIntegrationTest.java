@@ -55,7 +55,8 @@ public abstract class BaseIntegrationTest {
         firestoreEmulator.start();
 
         stripeMock = new GenericContainer<>("stripe/stripe-mock:latest")
-                .withExposedPorts(STRIPE_MOCK_PORT);
+                .withExposedPorts(STRIPE_MOCK_PORT)
+                .waitingFor(Wait.forLogMessage(".*Listening for HTTP.*", 1));
         stripeMock.start();
     }
 
@@ -271,5 +272,60 @@ public abstract class BaseIntegrationTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.COOKIE, sessionCookie);
         return headers;
+    }
+
+    /**
+     * Extracts CSRF token from a response - tries HTML body first, then XSRF-TOKEN cookie.
+     */
+    protected String extractCsrf(ResponseEntity<String> response) {
+        // Try HTML hidden input first
+        String token = extractCsrfToken(response.getBody());
+        if (token != null) {
+            return token;
+        }
+        // Fall back to XSRF-TOKEN cookie
+        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        if (cookies != null) {
+            for (String cookie : cookies) {
+                if (cookie.startsWith("XSRF-TOKEN=")) {
+                    String value = cookie.split(";")[0].substring("XSRF-TOKEN=".length());
+                    if (!value.isEmpty()) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extracts any updated session cookie from response, falling back to the provided cookie.
+     */
+    protected String extractUpdatedSession(ResponseEntity<String> response, String fallback) {
+        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        if (cookies != null) {
+            for (String cookie : cookies) {
+                if (cookie.contains("AZADI_SESSION") || cookie.contains("SESSION")) {
+                    return cookie.split(";")[0];
+                }
+            }
+        }
+        return fallback;
+    }
+
+    /**
+     * Builds cookie header string combining session and XSRF-TOKEN for POST requests.
+     */
+    protected String buildCookieHeader(ResponseEntity<String> response, String sessionCookie) {
+        String cookies = sessionCookie;
+        var setCookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        if (setCookies != null) {
+            for (String c : setCookies) {
+                if (c.startsWith("XSRF-TOKEN=")) {
+                    cookies = cookies + "; " + c.split(";")[0];
+                }
+            }
+        }
+        return cookies;
     }
 }

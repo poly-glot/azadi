@@ -33,7 +33,7 @@
           <div class="c-inline-edit__display">
             <div>
               <strong class="c-inline-edit__label">Current Address:</strong>
-              <span class="c-inline-edit__value" th:text="${contactDetails.address ?: '29 Street Name, Town, County A12 BCD'}">29 Street Name, Town, County A12 BCD</span>
+              <span class="c-inline-edit__value" th:text="${customer != null and customer.addressLine1 != null ? customer.addressLine1 : '29 Street Name, Town, County A12 BCD'}">29 Street Name, Town, County A12 BCD</span>
             </div>
             <button type="button" class="c-inline-edit__button" data-inline-edit-trigger>Edit Address</button>
           </div>
@@ -67,7 +67,7 @@
           <div class="c-inline-edit__display">
             <div>
               <strong class="c-inline-edit__label">Home Phone Number:</strong>
-              <span class="c-inline-edit__value" th:text="${contactDetails.homePhone ?: '0121 552 2828'}">0121 552 2828</span>
+              <span class="c-inline-edit__value" th:text="${customer != null and customer.phone != null ? customer.phone : '0121 552 2828'}">0121 552 2828</span>
             </div>
             <button type="button" class="c-inline-edit__button" data-inline-edit-trigger>Edit Number</button>
           </div>
@@ -75,7 +75,7 @@
             <div>
               <strong class="c-inline-edit__label">New Phone Number:</strong>
               <input type="tel" name="homePhone" class="c-input"
-                     th:placeholder="${contactDetails.homePhone ?: '0121 552 2828'}">
+                     th:placeholder="${customer != null and customer.phone != null ? customer.phone : '0121 552 2828'}">
             </div>
             <div class="c-inline-edit__actions">
               <button type="submit" class="c-button c-button--small">Confirm</button>
@@ -91,7 +91,7 @@
           <div class="c-inline-edit__display">
             <div>
               <strong class="c-inline-edit__label">Mobile Phone Number:</strong>
-              <span class="c-inline-edit__value" th:text="${contactDetails.mobilePhone ?: '07989856632'}">07989856632</span>
+              <span class="c-inline-edit__value" th:text="${customer != null and customer.phone != null ? customer.phone : '07989856632'}">07989856632</span>
             </div>
             <button type="button" class="c-inline-edit__button" data-inline-edit-trigger>Edit Number</button>
           </div>
@@ -99,7 +99,7 @@
             <div>
               <strong class="c-inline-edit__label">New Mobile Phone Number:</strong>
               <input type="tel" name="mobilePhone" class="c-input"
-                     th:placeholder="${contactDetails.mobilePhone ?: '07989856632'}">
+                     th:placeholder="${customer != null and customer.phone != null ? customer.phone : '07989856632'}">
             </div>
             <div class="c-inline-edit__actions">
               <button type="submit" class="c-button c-button--small">Confirm</button>
@@ -115,7 +115,7 @@
           <div class="c-inline-edit__display">
             <div>
               <strong class="c-inline-edit__label">Email Address:</strong>
-              <span class="c-inline-edit__value" th:text="${contactDetails.email ?: 'john.smith@internet.co.uk'}">john.smith@internet.co.uk</span>
+              <span class="c-inline-edit__value" th:text="${customer != null and customer.email != null ? customer.email : 'john.smith@internet.co.uk'}">john.smith@internet.co.uk</span>
             </div>
             <button type="button" class="c-inline-edit__button" data-inline-edit-trigger>Edit Email Address</button>
           </div>
@@ -123,7 +123,7 @@
             <div>
               <strong class="c-inline-edit__label">New Email Address:</strong>
               <input type="email" name="email" class="c-input"
-                     th:placeholder="${contactDetails.email ?: 'john.smith@internet.co.uk'}">
+                     th:placeholder="${customer != null and customer.email != null ? customer.email : 'john.smith@internet.co.uk'}">
             </div>
             <div class="c-inline-edit__actions">
               <button type="submit" class="c-button c-button--small">Confirm</button>

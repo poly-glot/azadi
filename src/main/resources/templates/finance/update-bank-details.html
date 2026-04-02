@@ -16,7 +16,7 @@
     Your bank details have been updated successfully.
   </div>
 
-  <form th:action="@{/finance/update-bank-details}" th:object="${bankDetailsForm}" method="post"
+  <form th:action="@{/finance/update-bank-details}" method="post"
         class="u-margin-bottom-normal">
 
     <!-- Confirmations -->
@@ -56,34 +56,27 @@
 
         <div class="c-form__field">
           <label for="accountHolder" class="c-form__label">Account holder(s) name:</label>
-          <input type="text" th:field="*{accountHolderName}" id="accountHolder" class="c-input"
+          <input type="text" name="accountHolderName" id="accountHolder" class="c-input"
+                 th:value="${bankDetails != null ? bankDetails.accountHolderName : ''}"
                  placeholder="Account holder(s) name" required>
-          <span th:if="${#fields.hasErrors('accountHolderName')}" class="c-field-error"
-                th:errors="*{accountHolderName}"></span>
         </div>
 
         <div class="c-form__field">
           <label for="accountNumber" class="c-form__label">Account number:</label>
-          <input type="text" th:field="*{accountNumber}" id="accountNumber"
+          <input type="text" name="accountNumber" id="accountNumber"
                  class="c-input c-input--medium"
+                 th:value="${bankDetails != null ? '****' + bankDetails.lastFourAccount : ''}"
                  placeholder="Account number" inputmode="numeric" required
                  maxlength="8" pattern="[0-9]{8}">
-          <span th:if="${#fields.hasErrors('accountNumber')}" class="c-field-error"
-                th:errors="*{accountNumber}"></span>
         </div>
 
         <div class="c-form__field">
-          <label class="c-form__label">Bank sort code:</label>
-          <div class="c-input-group">
-            <input type="text" th:field="*{sortCode1}" class="c-input c-input--tiny"
-                   placeholder="00" maxlength="2" inputmode="numeric" required>
-            <span class="c-input-group__sep">-</span>
-            <input type="text" th:field="*{sortCode2}" class="c-input c-input--tiny"
-                   placeholder="00" maxlength="2" inputmode="numeric" required>
-            <span class="c-input-group__sep">-</span>
-            <input type="text" th:field="*{sortCode3}" class="c-input c-input--tiny"
-                   placeholder="00" maxlength="2" inputmode="numeric" required>
-          </div>
+          <label for="sortCode" class="c-form__label">Bank sort code:</label>
+          <input type="text" name="sortCode" id="sortCode"
+                 class="c-input c-input--medium"
+                 th:value="${bankDetails != null ? '**-**-' + bankDetails.lastTwoSortCode : ''}"
+                 placeholder="XX-XX-XX" required
+                 maxlength="8" pattern="\d{2}-\d{2}-\d{2}">
         </div>
 
         <div class="c-form__actions">
