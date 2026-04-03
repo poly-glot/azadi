@@ -46,7 +46,7 @@
 
 .c-accordion__summary--link {
   background: transparent;
-  padding-inline: 0;
+  padding: 0;
   color: var(--color-link, #1a0dab);
   text-transform: none;
   font-weight: 400;
@@ -164,6 +164,10 @@
   font-weight: 600;
 }
 
+.c-accordion--faq .c-accordion__summary--link::before {
+  content: none;
+}
+
 .c-accordion--faq .c-accordion__summary:hover {
   background-color: transparent;
   color: var(--color-gray-600);
@@ -176,6 +180,13 @@
 
 .c-accordion--plain {
   border: none;
+}
+
+.c-accordion--plain-no-border,
+.c-accordion--plain-no-border:first-of-type {
+  border: none;
+  border-block-start: none;
+  border-block-end: none;
 }
 
 /* Ways-to-pay spaced variant */

@@ -18,9 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
             .addResourceLocations("classpath:/static/assets/")
             .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)));
 
-        // Dev mode: serve images from frontend source directory
+        // Serve images from classpath (production) with fallback to filesystem (dev)
         registry.addResourceHandler("/assets/img/**")
-            .addResourceLocations("file:frontend/src/img/");
+            .addResourceLocations("classpath:/static/assets/img/", "file:frontend/src/img/");
     }
 
     @Bean

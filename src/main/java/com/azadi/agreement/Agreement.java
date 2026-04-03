@@ -26,7 +26,7 @@ public class Agreement {
     private LocalDate nextPaymentDate;
     private int paymentsRemaining;
     private LocalDate finalPaymentDate;
-    private boolean paymentDateChanged;
+    private Boolean paymentDateChanged;
 
     public Long getId() {
         return id;
@@ -165,10 +165,10 @@ public class Agreement {
     }
 
     public boolean isPaymentDateChanged() {
-        return paymentDateChanged;
+        return Boolean.TRUE.equals(paymentDateChanged);
     }
 
-    public void setPaymentDateChanged(boolean paymentDateChanged) {
+    public void setPaymentDateChanged(Boolean paymentDateChanged) {
         this.paymentDateChanged = paymentDateChanged;
     }
 }

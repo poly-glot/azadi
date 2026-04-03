@@ -143,7 +143,6 @@ jobs:
         run: |
           firebase hosting:channel:deploy staging \
             --project ${{ env.GCP_PROJECT_ID }} \
-            --site ${{ env.FIREBASE_SITE_ID }} \
             --expires 7d
 
   # ──────────────────────────────────────────────
