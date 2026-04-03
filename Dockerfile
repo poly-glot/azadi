@@ -74,6 +74,7 @@ RUN addgroup -S appuser && adduser -S appuser -G appuser
 
 WORKDIR /app
 COPY --from=native-builder /app/target/azadi .
+COPY --from=native-builder /app/target/lib*.so ./
 
 RUN chown -R appuser:appuser /app
 USER appuser
