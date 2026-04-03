@@ -200,7 +200,7 @@ public abstract class BaseIntegrationTest {
 
             // Extract the authenticated session cookie from the cookie store
             return cookieManager.getCookieStore().getCookies().stream()
-                    .filter(c -> c.getName().contains("AZADI_SESSION") || c.getName().contains("SESSION"))
+                    .filter(c -> c.getName().contains("__session") || c.getName().contains("SESSION"))
                     .map(c -> c.getName() + "=" + c.getValue())
                     .findFirst()
                     .orElse("");
@@ -223,7 +223,7 @@ public abstract class BaseIntegrationTest {
 
     protected String extractSessionCookie(ResponseEntity<String> response) {
         return response.getHeaders().getOrEmpty(HttpHeaders.SET_COOKIE).stream()
-                .filter(c -> c.contains("AZADI_SESSION") || c.contains("SESSION"))
+                .filter(c -> c.contains("__session") || c.contains("SESSION"))
                 .map(c -> c.split(";")[0])
                 .findFirst()
                 .orElse("");

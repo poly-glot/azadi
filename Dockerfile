@@ -9,9 +9,12 @@ COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 RUN chmod +x mvnw
 
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+
 RUN --mount=type=cache,target=/root/.m2,sharing=locked \
     ./mvnw dependency:resolve -P no-checks -B
 
+COPY .git/ .git/
 COPY src/ src/
 COPY frontend/ frontend/
 
@@ -50,7 +53,7 @@ FROM ghcr.io/graalvm/native-image-community:25 AS native-builder
 ARG VITE_STRIPE_PUBLISHABLE_KEY
 ENV VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
 
-RUN microdnf install -y findutils
+RUN microdnf install -y findutils git
 
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8
 
@@ -58,6 +61,7 @@ WORKDIR /app
 
 COPY --from=deps /app/.mvn/ .mvn/
 COPY --from=deps /app/mvnw /app/pom.xml ./
+COPY --from=deps /app/.git/ .git/
 COPY --from=deps /app/src/ src/
 COPY --from=deps /app/frontend/ frontend/
 

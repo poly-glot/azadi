@@ -15,7 +15,7 @@ server:
         secure: false
         same-site: lax
         http-only: true
-        name: AZADI_SESSION
+        name: __session
   docker:
     compose:
       enabled: false

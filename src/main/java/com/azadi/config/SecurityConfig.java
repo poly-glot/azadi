@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login")
                 .invalidateHttpSession(true)
-                .deleteCookies("AZADI_SESSION")
+                .deleteCookies("__session")
             )
             .sessionManagement(session -> session
                 .sessionFixation().migrateSession()

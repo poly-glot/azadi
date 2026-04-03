@@ -100,6 +100,6 @@ class SecurityIntegrationTest extends BaseIntegrationTest {
         assertThat(sessionCookie).isNotNull().isNotBlank();
 
         // The session cookie should contain the configured name
-        assertThat(sessionCookie).containsIgnoringCase("AZADI_SESSION");
+        assertThat(sessionCookie).containsIgnoringCase("__session");
     }
 }
