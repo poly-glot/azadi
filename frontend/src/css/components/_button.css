@@ -18,7 +18,9 @@
   border: 2px solid var(--color-primary);
   border-radius: var(--radius);
   cursor: pointer;
-  transition: color 0.4s, background-color 0.4s;
+  transition:
+    color 0.4s,
+    background-color 0.4s;
 }
 
 .c-button:hover {

@@ -84,7 +84,9 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: color 0.4s, background-color 0.4s;
+  transition:
+    color 0.4s,
+    background-color 0.4s;
 }
 
 .c-site-header__burger[aria-expanded='true'] {

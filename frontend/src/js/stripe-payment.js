@@ -20,7 +20,7 @@ export function initStripePayment() {
     return;
   }
 
-  const stripe = Stripe(publishableKey); // eslint-disable-line no-undef
+  const stripe = Stripe(publishableKey);
   const elements = stripe.elements();
   const errorDisplay = document.getElementById('card-errors');
   const submitButton = paymentForm.querySelector('[type="submit"]');

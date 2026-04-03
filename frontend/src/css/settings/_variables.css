@@ -28,13 +28,13 @@
   --line-height: 1.5;
 
   /* Fixed type scale */
-  --font-size-xs: 0.71429rem;   /* 10px */
-  --font-size-sm: 0.85714rem;   /* 12px */
-  --font-size-md: 1rem;          /* 14px */
-  --font-size-lg: 1.14286rem;   /* 16px */
-  --font-size-xl: 1.28571rem;   /* 18px */
-  --font-size-2xl: 1.71429rem;  /* 24px */
-  --font-size-3xl: 2.71429rem;  /* 38px */
+  --font-size-xs: 0.71429rem; /* 10px */
+  --font-size-sm: 0.85714rem; /* 12px */
+  --font-size-md: 1rem; /* 14px */
+  --font-size-lg: 1.14286rem; /* 16px */
+  --font-size-xl: 1.28571rem; /* 18px */
+  --font-size-2xl: 1.71429rem; /* 24px */
+  --font-size-3xl: 2.71429rem; /* 38px */
 
   /* Spacing — 21px base matches reference (1.5rem at 14px) */
   --spacing-unit: 21px;

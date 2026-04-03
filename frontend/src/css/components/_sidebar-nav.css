@@ -32,7 +32,9 @@
   font-size: var(--font-size-sm);
   font-weight: 500;
   text-transform: uppercase;
-  transition: color 0.4s, background-color 0.4s;
+  transition:
+    color 0.4s,
+    background-color 0.4s;
 }
 
 .c-nav-link:hover {
@@ -101,7 +103,9 @@
   text-transform: uppercase;
   cursor: pointer;
   list-style: none;
-  transition: color 0.4s, background-color 0.4s;
+  transition:
+    color 0.4s,
+    background-color 0.4s;
 }
 
 .c-nav-details > summary::-webkit-details-marker {
@@ -146,7 +150,9 @@
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
-  transition: color 0.4s, background-color 0.4s;
+  transition:
+    color 0.4s,
+    background-color 0.4s;
 }
 
 .c-nav-sub__link:hover {

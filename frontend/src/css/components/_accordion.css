@@ -158,7 +158,7 @@
 }
 
 .c-accordion--faq .c-accordion__summary::before {
-  content: counter(faq) ".";
+  content: counter(faq) '.';
   min-width: 1.75em;
   flex-shrink: 0;
   font-weight: 600;
@@ -175,7 +175,7 @@
 }
 
 .c-accordion--plain {
-    border: none;
+  border: none;
 }
 
 /* Ways-to-pay spaced variant */

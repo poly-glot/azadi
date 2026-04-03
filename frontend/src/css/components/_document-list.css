@@ -18,7 +18,9 @@
   color: var(--color-primary);
   border-block-end: 1px solid var(--color-gray-400);
   font-family: var(--font-family);
-  transition: color 0.4s, background-color 0.4s;
+  transition:
+    color 0.4s,
+    background-color 0.4s;
   width: 100%;
 }
 

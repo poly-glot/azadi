@@ -188,7 +188,7 @@
 }
 
 .c-form__actions--inline {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
