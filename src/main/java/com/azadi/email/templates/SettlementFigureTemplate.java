@@ -1,12 +1,14 @@
 package com.azadi.email.templates;
 
+import com.azadi.common.MoneyFormatter;
+
 public final class SettlementFigureTemplate {
 
     private SettlementFigureTemplate() {
     }
 
     public static String build(long amountPence, String validUntil) {
-        var amount = String.format("\u00A3%,.2f", amountPence / 100.0);
+        var amount = MoneyFormatter.formatPence(amountPence);
         return EmailLayoutTemplate.wrap("Settlement Figure", """
             <h1 style="color:#0c121d;font-family:'Poppins',Arial,sans-serif;font-size:24px;margin:0 0 16px;">
                 Your Settlement Figure

@@ -18,9 +18,6 @@ public final class InputSanitizer {
     }
 
     public static String stripAll(String input) {
-        if (input == null) {
-            return null;
-        }
-        return STRIP_ALL_POLICY.sanitize(input).trim();
+        return sanitize(input);
     }
 }

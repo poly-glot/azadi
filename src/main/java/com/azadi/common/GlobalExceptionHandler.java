@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.stripe.exception.StripeException;
+
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,8 +33,7 @@ public class GlobalExceptionHandler {
     public String handleValidation(MethodArgumentNotValidException ex, Model model) {
         var message = ex.getBindingResult().getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
-            .reduce((a, b) -> a + "; " + b)
-            .orElse("Please check your input and try again.");
+            .collect(Collectors.joining("; "));
         populateErrorModel(model, 400, "Bad Request", message);
         return "error";
     }
@@ -47,14 +49,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleIllegalArgument(IllegalArgumentException ex, Model model) {
-        populateErrorModel(model, 400, "Invalid Request", ex.getMessage());
+        LOG.warn("Invalid request: {}", ex.getMessage());
+        populateErrorModel(model, 400, "Invalid Request",
+            "The request contained invalid data.");
         return "error";
     }
 
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleIllegalState(IllegalStateException ex, Model model) {
-        populateErrorModel(model, 409, "Action Not Allowed", ex.getMessage());
+        LOG.warn("Illegal state: {}", ex.getMessage());
+        populateErrorModel(model, 409, "Action Not Allowed",
+            "This action cannot be performed at this time.");
+        return "error";
+    }
+
+    @ExceptionHandler(StripeException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public String handleStripeException(StripeException ex, Model model) {
+        LOG.error("Stripe error", ex);
+        populateErrorModel(model, 502, "Payment Service Unavailable",
+            "Payment service unavailable. Please try again.");
         return "error";
     }
 

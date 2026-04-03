@@ -16,7 +16,6 @@ import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,18 +50,13 @@ public class NativeHints {
             }
 
             // JDK collection types used via SpEL (.size(), .empty, iteration)
-            var jdkCollections = new ArrayList<Class<?>>();
-            jdkCollections.add(java.util.ArrayList.class);
-            jdkCollections.add(java.util.Collections.emptyList().getClass());
-            jdkCollections.add(List.of().getClass());
-            jdkCollections.add(List.of(1).getClass());
-            jdkCollections.add(List.of(1, 2).getClass());
-            try {
-                jdkCollections.add(Class.forName("java.util.ImmutableCollections$ListN"));
-                jdkCollections.add(Class.forName("java.util.ImmutableCollections$List12"));
-                jdkCollections.add(Class.forName("java.util.ImmutableCollections$SubList"));
-            } catch (ClassNotFoundException ignored) {
-            }
+            var jdkCollections = List.of(
+                java.util.ArrayList.class,
+                java.util.Collections.emptyList().getClass(),
+                List.of().getClass(),
+                List.of(1).getClass(),
+                List.of(1, 2).getClass()
+            );
 
             for (var type : jdkCollections) {
                 hints.reflection().registerType(type,

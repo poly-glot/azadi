@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class LoginAttemptTracker {
@@ -14,9 +13,15 @@ public class LoginAttemptTracker {
     private static final int MAX_ATTEMPTS = 5;
     private static final Duration LOCK_DURATION = Duration.ofMinutes(30);
 
-    record LoginAttempt(AtomicInteger count, Instant lockUntil, Instant createdAt) {
+    record LoginAttempt(int count, Instant lockUntil, Instant createdAt) {
         static LoginAttempt create() {
-            return new LoginAttempt(new AtomicInteger(0), Instant.MIN, Instant.now());
+            return new LoginAttempt(0, Instant.MIN, Instant.now());
+        }
+
+        LoginAttempt incrementAndLockIfNeeded(Duration lockDuration, int maxAttempts) {
+            var newCount = count + 1;
+            var newLockUntil = newCount >= maxAttempts ? Instant.now().plus(lockDuration) : lockUntil;
+            return new LoginAttempt(newCount, newLockUntil, createdAt);
         }
     }
 
@@ -27,16 +32,14 @@ public class LoginAttemptTracker {
         if (attempt == null) {
             return false;
         }
-        return attempt.count().get() >= MAX_ATTEMPTS && Instant.now().isBefore(attempt.lockUntil());
+        return attempt.count() >= MAX_ATTEMPTS && Instant.now().isBefore(attempt.lockUntil());
     }
 
     public void recordFailure(String agreementNumber) {
-        var attempt = attempts.computeIfAbsent(agreementNumber, k -> LoginAttempt.create());
-        var count = attempt.count().incrementAndGet();
-        if (count >= MAX_ATTEMPTS) {
-            attempts.put(agreementNumber,
-                new LoginAttempt(new AtomicInteger(count), Instant.now().plus(LOCK_DURATION), attempt.createdAt()));
-        }
+        attempts.compute(agreementNumber, (k, existing) -> {
+            var attempt = existing != null ? existing : LoginAttempt.create();
+            return attempt.incrementAndLockIfNeeded(LOCK_DURATION, MAX_ATTEMPTS);
+        });
     }
 
     public void recordSuccess(String agreementNumber) {
@@ -52,7 +55,7 @@ public class LoginAttemptTracker {
         var now = Instant.now();
         attempts.entrySet().removeIf(entry -> {
             var attempt = entry.getValue();
-            if (attempt.count().get() >= MAX_ATTEMPTS) {
+            if (attempt.count() >= MAX_ATTEMPTS) {
                 return now.isAfter(attempt.lockUntil());
             }
             return now.isAfter(attempt.createdAt().plus(LOCK_DURATION));

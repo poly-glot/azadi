@@ -7,8 +7,8 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Reads the Vite manifest ({@code static/.vite/manifest.json}) at startup and
@@ -27,10 +27,10 @@ public class ViteManifestConfig {
                 resource.getInputStream(),
                 new TypeReference<>() {}
             );
-            manifest = new HashMap<>();
-            for (var entry : raw.entrySet()) {
-                manifest.put(entry.getKey(), "/" + entry.getValue().get("file"));
-            }
+            manifest = raw.entrySet().stream()
+                .collect(Collectors.toUnmodifiableMap(
+                    Map.Entry::getKey,
+                    entry -> "/" + entry.getValue().get("file")));
         } else {
             manifest = Map.of();
         }

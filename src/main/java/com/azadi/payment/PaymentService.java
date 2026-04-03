@@ -1,5 +1,6 @@
 package com.azadi.payment;
 
+import com.azadi.agreement.AgreementService;
 import com.azadi.audit.AuditService;
 import com.azadi.auth.CustomerRepository;
 import com.stripe.exception.StripeException;
@@ -20,23 +21,33 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final AuditService auditService;
     private final CustomerRepository customerRepository;
+    private final AgreementService agreementService;
 
     public PaymentService(StripePaymentService stripePaymentService,
                           PaymentRepository paymentRepository,
                           AuditService auditService,
-                          CustomerRepository customerRepository) {
+                          CustomerRepository customerRepository,
+                          AgreementService agreementService) {
         this.stripePaymentService = stripePaymentService;
         this.paymentRepository = paymentRepository;
         this.auditService = auditService;
         this.customerRepository = customerRepository;
+        this.agreementService = agreementService;
     }
 
-    public PaymentIntent initiatePayment(long amountPence, Long agreementId,
-                                         String agreementNumber, String customerId,
-                                         String ipAddress) throws StripeException {
+    public PaymentIntent initiatePayment(String customerId, Long agreementId,
+                                         long amountPence, String ipAddress) throws StripeException {
+        var agreement = agreementService.getAgreement(customerId, agreementId);
+        var agreementNumber = agreement.getAgreementNumber();
+
         var customerEmail = customerRepository.findByCustomerId(customerId)
-            .map(c -> c.getEmail() != null ? c.getEmail() : "")
-            .orElse("");
+            .map(c -> c.getEmail())
+            .filter(e -> e != null && !e.isBlank())
+            .orElseGet(() -> {
+                LOG.warn("No email found for customer: {}", customerId);
+                return "";
+            });
+
         var paymentIntent = stripePaymentService.createPaymentIntent(
             amountPence, agreementNumber, customerEmail);
 

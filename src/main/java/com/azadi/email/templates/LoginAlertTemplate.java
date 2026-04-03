@@ -1,11 +1,14 @@
 package com.azadi.email.templates;
 
+import org.springframework.web.util.HtmlUtils;
+
 public final class LoginAlertTemplate {
 
     private LoginAlertTemplate() {
     }
 
     public static String build(String ipAddress) {
+        var safeIp = HtmlUtils.htmlEscape(ipAddress);
         return EmailLayoutTemplate.wrap("Login Alert", """
             <h1 style="color:#0c121d;font-family:'Poppins',Arial,sans-serif;font-size:24px;margin:0 0 16px;">
                 New Login Detected
@@ -19,6 +22,6 @@ public final class LoginAlertTemplate {
             <p style="color:#666;font-family:'Poppins',Arial,sans-serif;font-size:14px;line-height:1.5;margin-top:24px;">
                 If this was not you, please change your credentials and contact us immediately.
             </p>
-            """.formatted(ipAddress));
+            """.formatted(safeIp));
     }
 }

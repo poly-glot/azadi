@@ -54,14 +54,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         if ("POST".equals(method) && path.contains("/make-a-payment")) {
-            var sessionId = request.getSession(false) != null ? request.getSession().getId() : extractClientIp(request);
-            if (isRateLimited(paymentBuckets, "pay:" + sessionId, PAYMENT_MAX, PAYMENT_WINDOW)) {
+            var paySessionId = resolveClientKey(request);
+            if (isRateLimited(paymentBuckets, "pay:" + paySessionId, PAYMENT_MAX, PAYMENT_WINDOW)) {
                 sendTooManyRequests(response, PAYMENT_WINDOW);
                 return;
             }
         }
 
-        var sessionKey = request.getSession(false) != null ? request.getSession().getId() : extractClientIp(request);
+        var sessionKey = resolveClientKey(request);
         if (isRateLimited(generalBuckets, "gen:" + sessionKey, GENERAL_MAX, GENERAL_WINDOW)) {
             sendTooManyRequests(response, GENERAL_WINDOW);
             return;
@@ -87,7 +87,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
         response.getWriter().write("Too many requests. Please try again later.");
     }
 
+    private String resolveClientKey(HttpServletRequest request) {
+        var session = request.getSession(false);
+        return session != null ? session.getId() : extractClientIp(request);
+    }
+
     private String extractClientIp(HttpServletRequest request) {
+        var forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            return forwarded.split(",")[0].trim();
+        }
         return request.getRemoteAddr();
     }
 

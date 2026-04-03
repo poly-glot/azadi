@@ -1,5 +1,6 @@
 package com.azadi.settlement.dto;
 
+import com.azadi.common.MoneyFormatter;
 import com.azadi.settlement.SettlementFigure;
 
 import java.time.Instant;
@@ -17,7 +18,7 @@ public record SettlementResponse(
         return new SettlementResponse(
             figure.getId(),
             figure.getAgreementId(),
-            String.format("\u00A3%,.2f", figure.getAmountPence() / 100.0),
+            MoneyFormatter.formatPence(figure.getAmountPence()),
             figure.getCalculatedAt(),
             figure.getValidUntil()
         );

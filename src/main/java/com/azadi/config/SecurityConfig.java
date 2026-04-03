@@ -70,7 +70,7 @@ public class SecurityConfig {
                 )
             )
             .csrf(csrf -> csrf
-                .csrfTokenRepository(new CookieCsrfTokenRepository())
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers("/api/stripe/webhook")
             )
             .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)

@@ -6,25 +6,20 @@ import com.azadi.auth.AuthorizationService;
 import com.azadi.payment.PaymentController;
 import com.azadi.payment.PaymentService;
 import com.azadi.payment.PaymentWebhookHandler;
-import com.azadi.payment.StripePaymentService;
-import com.stripe.exception.SignatureVerificationException;
-import com.stripe.model.Event;
-import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.StripeObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
@@ -44,7 +39,6 @@ class PaymentControllerTest {
 
     @MockitoBean private PaymentService paymentService;
     @MockitoBean private PaymentWebhookHandler webhookHandler;
-    @MockitoBean private StripePaymentService stripePaymentService;
     @MockitoBean private AgreementService agreementService;
     @MockitoBean private AuthorizationService authorizationService;
 
@@ -72,12 +66,9 @@ class PaymentControllerTest {
     void makePayment_returnsClientSecret() throws Exception {
         when(authorizationService.getCurrentCustomerId()).thenReturn("CUST-1");
 
-        var agreement = buildAgreement(1L);
-        when(agreementService.getAgreement("CUST-1", 1L)).thenReturn(agreement);
-
         var paymentIntent = mock(PaymentIntent.class);
         when(paymentIntent.getClientSecret()).thenReturn("pi_secret_123");
-        when(paymentService.initiatePayment(anyLong(), anyLong(), anyString(), anyString(), anyString()))
+        when(paymentService.initiatePayment(anyString(), anyLong(), anyLong(), anyString()))
             .thenReturn(paymentIntent);
 
         mockMvc.perform(post("/finance/make-a-payment")
@@ -90,21 +81,10 @@ class PaymentControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("POST /api/stripe/webhook with valid signature returns ok")
+    @DisplayName("POST /api/stripe/webhook delegates to handler and returns ok")
     void webhook_validSignature_returnsOk() throws Exception {
-        var event = mock(Event.class);
-        when(event.getType()).thenReturn("payment_intent.succeeded");
-        when(event.getId()).thenReturn("evt_123");
-
-        var paymentIntent = mock(PaymentIntent.class);
-        when(paymentIntent.getId()).thenReturn("pi_123");
-
-        var deserializer = mock(EventDataObjectDeserializer.class);
-        when(deserializer.getObject()).thenReturn(Optional.of(paymentIntent));
-        when(event.getDataObjectDeserializer()).thenReturn(deserializer);
-
-        when(stripePaymentService.constructWebhookEvent(anyString(), anyString()))
-            .thenReturn(event);
+        when(webhookHandler.handleEvent(anyString(), anyString(), anyString()))
+            .thenReturn(ResponseEntity.ok("ok"));
 
         mockMvc.perform(post("/api/stripe/webhook")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -118,8 +98,8 @@ class PaymentControllerTest {
     @WithMockUser
     @DisplayName("POST /api/stripe/webhook with invalid signature returns 400")
     void webhook_invalidSignature_returnsBadRequest() throws Exception {
-        when(stripePaymentService.constructWebhookEvent(anyString(), anyString()))
-            .thenThrow(new SignatureVerificationException("Invalid signature", "sig_header"));
+        when(webhookHandler.handleEvent(anyString(), anyString(), anyString()))
+            .thenReturn(ResponseEntity.badRequest().body("Invalid signature"));
 
         mockMvc.perform(post("/api/stripe/webhook")
                 .contentType(MediaType.APPLICATION_JSON)

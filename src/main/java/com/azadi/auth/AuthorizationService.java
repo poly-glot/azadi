@@ -21,17 +21,17 @@ public class AuthorizationService {
     }
 
     public String getCurrentCustomerId() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails details) {
-            return details.customerId();
-        }
-        throw new IllegalStateException("No authenticated user found.");
+        return getAuthenticatedUserDetails().customerId();
     }
 
     public String getCurrentCustomerName() {
+        return getAuthenticatedUserDetails().customerName();
+    }
+
+    private CustomUserDetails getAuthenticatedUserDetails() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails details) {
-            return details.customerName();
+            return details;
         }
         throw new IllegalStateException("No authenticated user found.");
     }

@@ -2,29 +2,29 @@ package com.azadi.payment;
 
 import com.azadi.agreement.Agreement;
 import com.azadi.agreement.AgreementRepository;
+import com.azadi.agreement.AgreementService;
 import com.azadi.audit.AuditService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @Service
 public class PaymentDateService {
 
     private final AgreementRepository agreementRepository;
+    private final AgreementService agreementService;
     private final AuditService auditService;
 
     public PaymentDateService(AgreementRepository agreementRepository,
+                              AgreementService agreementService,
                               AuditService auditService) {
         this.agreementRepository = agreementRepository;
+        this.agreementService = agreementService;
         this.auditService = auditService;
     }
 
     public void changePaymentDate(String customerId, Long agreementId, int newDay, String ipAddress) {
-        var agreement = agreementRepository.findById(agreementId)
-            .filter(a -> customerId.equals(a.getCustomerId()))
-            .orElseThrow(() -> new NoSuchElementException("Agreement not found: " + agreementId));
+        var agreement = agreementService.getAgreement(customerId, agreementId);
 
         if (agreement.isPaymentDateChanged()) {
             throw new IllegalStateException("Payment date has already been changed for this agreement.");

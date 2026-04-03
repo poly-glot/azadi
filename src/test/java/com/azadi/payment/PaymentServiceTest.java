@@ -1,5 +1,7 @@
 package com.azadi.payment;
 
+import com.azadi.agreement.Agreement;
+import com.azadi.agreement.AgreementService;
 import com.azadi.audit.AuditService;
 import com.azadi.auth.Customer;
 import com.azadi.auth.CustomerRepository;
@@ -35,6 +37,9 @@ class PaymentServiceTest {
     @Mock
     private CustomerRepository customerRepository;
 
+    @Mock
+    private AgreementService agreementService;
+
     private PaymentService paymentService;
 
     private static final String CUSTOMER_ID = "CUST-001";
@@ -45,13 +50,19 @@ class PaymentServiceTest {
     void setUp() {
         paymentService = new PaymentService(
             stripePaymentService, paymentRepository,
-            auditService, customerRepository);
+            auditService, customerRepository, agreementService);
     }
 
     @Test
     @DisplayName("initiatePayment creates Stripe intent and saves payment record")
     void initiatePaymentCreatesIntentAndSaves() throws Exception {
         // Arrange
+        var agreement = new Agreement();
+        agreement.setId(1L);
+        agreement.setAgreementNumber(AGREEMENT_NUMBER);
+        agreement.setCustomerId(CUSTOMER_ID);
+        when(agreementService.getAgreement(CUSTOMER_ID, 1L)).thenReturn(agreement);
+
         var customer = new Customer();
         customer.setEmail("test@test.com");
         when(customerRepository.findByCustomerId(CUSTOMER_ID)).thenReturn(Optional.of(customer));
@@ -64,7 +75,7 @@ class PaymentServiceTest {
 
         // Act
         var result = paymentService.initiatePayment(
-            AMOUNT_PENCE, 1L, AGREEMENT_NUMBER, CUSTOMER_ID, "127.0.0.1");
+            CUSTOMER_ID, 1L, AMOUNT_PENCE, "127.0.0.1");
 
         // Assert
         assertThat(result.getId()).isEqualTo("pi_test_123");

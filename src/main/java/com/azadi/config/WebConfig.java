@@ -25,6 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     public HttpClient httpClient() {
-        return HttpClient.newHttpClient();
+        return HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
     }
 }

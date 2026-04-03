@@ -15,7 +15,6 @@ public record UpdateBankDetailsRequest(
     String accountNumber,
 
     @NotBlank(message = "Sort code is required")
-    @Size(min = 8, max = 8, message = "Sort code must be in XX-XX-XX format")
     @Pattern(regexp = "\\d{2}-\\d{2}-\\d{2}", message = "Sort code must be in XX-XX-XX format")
     String sortCode
 ) {

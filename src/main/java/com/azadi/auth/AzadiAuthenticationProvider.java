@@ -59,22 +59,18 @@ public class AzadiAuthenticationProvider implements AuthenticationProvider {
         }
 
         var matchingAgreement = agreementRepository.findByAgreementNumber(agreementNumber)
-            .orElse(null);
-
-        if (matchingAgreement == null) {
-            loginAttemptTracker.recordFailure(agreementNumber);
-            throw new BadCredentialsException("Invalid agreement number, date of birth, or postcode.");
-        }
+            .orElseThrow(() -> {
+                loginAttemptTracker.recordFailure(agreementNumber);
+                return new BadCredentialsException("Invalid agreement number, date of birth, or postcode.");
+            });
 
         var customerId = matchingAgreement.getCustomerId();
 
         var customer = customerRepository.findByCustomerId(customerId)
-            .orElse(null);
-
-        if (customer == null) {
-            loginAttemptTracker.recordFailure(agreementNumber);
-            throw new BadCredentialsException("Invalid agreement number, date of birth, or postcode.");
-        }
+            .orElseThrow(() -> {
+                loginAttemptTracker.recordFailure(agreementNumber);
+                return new BadCredentialsException("Invalid agreement number, date of birth, or postcode.");
+            });
 
         var normalizedInputPostcode = postcode.replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
         var normalizedStoredPostcode = customer.getPostcode().replaceAll("\\s+", "").toUpperCase(Locale.ROOT);

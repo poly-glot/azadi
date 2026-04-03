@@ -1,12 +1,14 @@
 package com.azadi.email.templates;
 
+import com.azadi.common.MoneyFormatter;
+
 public final class PaymentConfirmationTemplate {
 
     private PaymentConfirmationTemplate() {
     }
 
     public static String build(long amountPence) {
-        var amount = String.format("\u00A3%,.2f", amountPence / 100.0);
+        var amount = MoneyFormatter.formatPence(amountPence);
         return EmailLayoutTemplate.wrap("Payment Confirmation", """
             <h1 style="color:#0c121d;font-family:'Poppins',Arial,sans-serif;font-size:24px;margin:0 0 16px;">
                 Payment Confirmed

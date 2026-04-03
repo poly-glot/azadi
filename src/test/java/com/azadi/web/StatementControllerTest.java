@@ -23,6 +23,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -72,8 +73,7 @@ class StatementControllerTest {
     @DisplayName("POST /finance/request-a-statement with agreementId redirects with success")
     void requestStatement_withAgreementId_redirectsWithSuccess() throws Exception {
         when(authorizationService.getCurrentCustomerId()).thenReturn("CUST-1");
-        when(agreementService.getAgreementsForCustomer("CUST-1"))
-            .thenReturn(List.of(buildAgreement(1L)));
+        when(statementService.resolveAgreementId("CUST-1", 1L)).thenReturn(1L);
 
         mockMvc.perform(post("/finance/request-a-statement")
                 .with(csrf())
@@ -91,10 +91,7 @@ class StatementControllerTest {
     @DisplayName("POST /finance/request-a-statement without agreementId falls back to first agreement")
     void requestStatement_noAgreementId_fallsBackToFirst() throws Exception {
         when(authorizationService.getCurrentCustomerId()).thenReturn("CUST-1");
-
-        var agreement = buildAgreement(42L);
-        when(agreementService.getAgreementsForCustomer("CUST-1"))
-            .thenReturn(List.of(agreement));
+        when(statementService.resolveAgreementId(eq("CUST-1"), isNull())).thenReturn(42L);
 
         mockMvc.perform(post("/finance/request-a-statement")
                 .with(csrf()))

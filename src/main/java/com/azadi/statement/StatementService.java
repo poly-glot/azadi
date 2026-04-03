@@ -1,5 +1,6 @@
 package com.azadi.statement;
 
+import com.azadi.agreement.AgreementService;
 import com.azadi.audit.AuditService;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +13,22 @@ public class StatementService {
 
     private final StatementRepository statementRepository;
     private final AuditService auditService;
+    private final AgreementService agreementService;
 
     public StatementService(StatementRepository statementRepository,
-                            AuditService auditService) {
+                            AuditService auditService,
+                            AgreementService agreementService) {
         this.statementRepository = statementRepository;
         this.auditService = auditService;
+        this.agreementService = agreementService;
+    }
+
+    public Long resolveAgreementId(String customerId, Long agreementId) {
+        if (agreementId != null) {
+            return agreementId;
+        }
+        var agreements = agreementService.getAgreementsForCustomer(customerId);
+        return agreements.isEmpty() ? null : agreements.getFirst().getId();
     }
 
     public StatementRequest requestStatement(String customerId, Long agreementId, String ipAddress) {

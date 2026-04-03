@@ -1,11 +1,14 @@
 package com.azadi.email.templates;
 
+import org.springframework.web.util.HtmlUtils;
+
 public final class PaymentDateChangedTemplate {
 
     private PaymentDateChangedTemplate() {
     }
 
     public static String build(String newDate) {
+        var safeDate = HtmlUtils.htmlEscape(newDate);
         return EmailLayoutTemplate.wrap("Payment Date Changed", """
             <h1 style="color:#0c121d;font-family:'Poppins',Arial,sans-serif;font-size:24px;margin:0 0 16px;">
                 Payment Date Changed
@@ -19,6 +22,6 @@ public final class PaymentDateChangedTemplate {
             <p style="color:#666;font-family:'Poppins',Arial,sans-serif;font-size:14px;line-height:1.5;margin-top:24px;">
                 If you did not request this change, please contact us immediately.
             </p>
-            """.formatted(newDate));
+            """.formatted(safeDate));
     }
 }

@@ -1,6 +1,7 @@
 package com.azadi.agreement.dto;
 
 import com.azadi.agreement.Agreement;
+import com.azadi.common.MoneyFormatter;
 
 import java.time.LocalDate;
 
@@ -28,23 +29,19 @@ public record AgreementResponse(
             agreement.getId(),
             agreement.getAgreementNumber(),
             agreement.getType(),
-            formatPence(agreement.getBalancePence()),
-            agreement.getApr() + "%",
+            MoneyFormatter.formatPence(agreement.getBalancePence()),
+            agreement.getApr() != null ? agreement.getApr() + "%" : "N/A",
             agreement.getOriginalTermMonths(),
             agreement.getContractMileage(),
-            formatPence(agreement.getExcessPricePerMilePence()),
+            MoneyFormatter.formatPence(agreement.getExcessPricePerMilePence()),
             agreement.getVehicleModel(),
             agreement.getRegistration(),
-            formatPence(agreement.getLastPaymentPence()),
+            MoneyFormatter.formatPence(agreement.getLastPaymentPence()),
             agreement.getLastPaymentDate(),
-            formatPence(agreement.getNextPaymentPence()),
+            MoneyFormatter.formatPence(agreement.getNextPaymentPence()),
             agreement.getNextPaymentDate(),
             agreement.getPaymentsRemaining(),
             agreement.getFinalPaymentDate()
         );
-    }
-
-    private static String formatPence(long pence) {
-        return String.format("\u00A3%,.2f", pence / 100.0);
     }
 }

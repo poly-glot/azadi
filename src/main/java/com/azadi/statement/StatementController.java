@@ -47,10 +47,9 @@ public class StatementController {
                                    HttpServletRequest request,
                                    RedirectAttributes redirectAttributes) {
         var customerId = authorizationService.getCurrentCustomerId();
-        var agreements = agreementService.getAgreementsForCustomer(customerId);
-        var agreeId = agreementId != null ? agreementId : (agreements.isEmpty() ? null : agreements.get(0).getId());
-        if (agreeId != null) {
-            statementService.requestStatement(customerId, agreeId, request.getRemoteAddr());
+        var resolvedAgreementId = statementService.resolveAgreementId(customerId, agreementId);
+        if (resolvedAgreementId != null) {
+            statementService.requestStatement(customerId, resolvedAgreementId, request.getRemoteAddr());
         }
         redirectAttributes.addFlashAttribute("success", "Statement requested successfully. You will receive it by email.");
         return "redirect:/finance/request-a-statement";

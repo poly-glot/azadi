@@ -2,6 +2,7 @@ package com.azadi.payment;
 
 import com.azadi.agreement.Agreement;
 import com.azadi.agreement.AgreementRepository;
+import com.azadi.agreement.AgreementService;
 import com.azadi.audit.AuditService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
@@ -25,6 +27,7 @@ import static org.mockito.Mockito.when;
 class PaymentDateServiceTest {
 
     @Mock private AgreementRepository agreementRepository;
+    @Mock private AgreementService agreementService;
     @Mock private AuditService auditService;
 
     private PaymentDateService service;
@@ -33,14 +36,14 @@ class PaymentDateServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new PaymentDateService(agreementRepository, auditService);
+        service = new PaymentDateService(agreementRepository, agreementService, auditService);
     }
 
     @Test
     @DisplayName("Changes payment date and marks agreement as changed")
     void changePaymentDate_success() {
         var agreement = buildAgreement(1L, CUSTOMER_ID, false, LocalDate.of(2026, 5, 8));
-        when(agreementRepository.findById(1L)).thenReturn(Optional.of(agreement));
+        when(agreementService.getAgreement(CUSTOMER_ID, 1L)).thenReturn(agreement);
 
         service.changePaymentDate(CUSTOMER_ID, 1L, 15, "127.0.0.1");
 
@@ -54,7 +57,7 @@ class PaymentDateServiceTest {
     @DisplayName("Rejects second date change on same agreement")
     void changePaymentDate_alreadyChanged_throws() {
         var agreement = buildAgreement(1L, CUSTOMER_ID, true, LocalDate.of(2026, 5, 15));
-        when(agreementRepository.findById(1L)).thenReturn(Optional.of(agreement));
+        when(agreementService.getAgreement(CUSTOMER_ID, 1L)).thenReturn(agreement);
 
         assertThatThrownBy(() -> service.changePaymentDate(CUSTOMER_ID, 1L, 20, "127.0.0.1"))
             .isInstanceOf(IllegalStateException.class)
@@ -65,7 +68,7 @@ class PaymentDateServiceTest {
     @DisplayName("Rejects invalid day outside 1-28")
     void changePaymentDate_invalidDay_throws() {
         var agreement = buildAgreement(1L, CUSTOMER_ID, false, LocalDate.of(2026, 5, 8));
-        when(agreementRepository.findById(1L)).thenReturn(Optional.of(agreement));
+        when(agreementService.getAgreement(CUSTOMER_ID, 1L)).thenReturn(agreement);
 
         assertThatThrownBy(() -> service.changePaymentDate(CUSTOMER_ID, 1L, 30, "127.0.0.1"))
             .isInstanceOf(IllegalArgumentException.class);
@@ -74,7 +77,8 @@ class PaymentDateServiceTest {
     @Test
     @DisplayName("Throws when agreement not found")
     void changePaymentDate_notFound_throws() {
-        when(agreementRepository.findById(99L)).thenReturn(Optional.empty());
+        when(agreementService.getAgreement(CUSTOMER_ID, 99L))
+            .thenThrow(new NoSuchElementException("Agreement not found: 99"));
 
         assertThatThrownBy(() -> service.changePaymentDate(CUSTOMER_ID, 99L, 15, "127.0.0.1"))
             .isInstanceOf(NoSuchElementException.class);
@@ -83,11 +87,11 @@ class PaymentDateServiceTest {
     @Test
     @DisplayName("Throws when customer does not own agreement")
     void changePaymentDate_wrongCustomer_throws() {
-        var agreement = buildAgreement(1L, "OTHER-CUST", false, LocalDate.of(2026, 5, 8));
-        when(agreementRepository.findById(1L)).thenReturn(Optional.of(agreement));
+        when(agreementService.getAgreement(CUSTOMER_ID, 1L))
+            .thenThrow(new AccessDeniedException("You do not have access to this agreement."));
 
         assertThatThrownBy(() -> service.changePaymentDate(CUSTOMER_ID, 1L, 15, "127.0.0.1"))
-            .isInstanceOf(NoSuchElementException.class);
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
