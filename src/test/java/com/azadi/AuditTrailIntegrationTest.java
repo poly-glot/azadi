@@ -149,11 +149,15 @@ class AuditTrailIntegrationTest extends BaseIntegrationTest {
         // Ensure the POST was accepted
         assertThat(postResponse.getStatusCode().value()).isIn(200, 302);
 
-        // Wait for async audit write
-        Thread.sleep(2000);
-
-        // Assert
-        List<Entity> auditEvents = queryAuditEvents();
+        // Poll for async audit write (up to 10s)
+        List<Entity> auditEvents = List.of();
+        for (int i = 0; i < 20; i++) {
+            Thread.sleep(500);
+            auditEvents = queryAuditEvents();
+            if (!auditEvents.isEmpty()) {
+                break;
+            }
+        }
         assertThat(auditEvents).isNotEmpty();
 
         Entity event = auditEvents.getFirst();
