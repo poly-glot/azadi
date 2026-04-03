@@ -139,12 +139,11 @@ public class AppDomainFilter {
             if (location.startsWith("/")) {
                 super.sendRedirect(baseUrl + location);
             } else if (location.startsWith("http://") || location.startsWith("https://")) {
-                // Rewrite absolute URLs that point to the wrong host
-                if (!location.contains(host)) {
+                if (location.contains(host)) {
+                    super.sendRedirect(location);
+                } else {
                     var path = location.replaceFirst("https?://[^/]+", "");
                     super.sendRedirect(baseUrl + path);
-                } else {
-                    super.sendRedirect(location);
                 }
             } else {
                 super.sendRedirect(baseUrl + "/" + location);
