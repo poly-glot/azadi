@@ -6,11 +6,14 @@ import com.google.cloud.datastore.Datastore;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.http.client.HttpRedirects;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,16 +30,20 @@ import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.KeyFactory;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 @ActiveProfiles("test")
 @Testcontainers
 public abstract class BaseIntegrationTest {
 
     private static final int FIRESTORE_PORT = 8081;
     private static final int STRIPE_MOCK_PORT = 12111;
+    private static final DateTimeFormatter DOB_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     static final GenericContainer<?> firestoreEmulator;
     static final GenericContainer<?> stripeMock;
@@ -54,7 +61,8 @@ public abstract class BaseIntegrationTest {
         firestoreEmulator.start();
 
         stripeMock = new GenericContainer<>("stripe/stripe-mock:latest")
-                .withExposedPorts(STRIPE_MOCK_PORT);
+                .withExposedPorts(STRIPE_MOCK_PORT)
+                .waitingFor(Wait.forLogMessage(".*Listening for HTTP.*", 1));
         stripeMock.start();
     }
 
@@ -68,6 +76,8 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.cloud.gcp.project-id", () -> "test-project");
         registry.add("stripe.api-key", () -> "sk_test_mock");
         registry.add("stripe.webhook-secret", () -> "whsec_test_mock");
+        registry.add("stripe.api-base", () -> "http://"
+                + stripeMock.getHost() + ":" + stripeMock.getMappedPort(STRIPE_MOCK_PORT));
     }
 
     @LocalServerPort
@@ -108,7 +118,9 @@ public abstract class BaseIntegrationTest {
         }
     }
 
-    protected long createTestCustomer(LocalDate dob, String postcode, String agreementNumber) {
+    protected record TestIds(long customerId, long agreementId) {}
+
+    protected TestIds createTestData(LocalDate dob, String postcode, String agreementNumber) {
         KeyFactory customerKeyFactory = datastore.newKeyFactory().setKind("Customer");
         Key customerKey = datastore.allocateId(customerKeyFactory.newKey());
 
@@ -118,7 +130,7 @@ public abstract class BaseIntegrationTest {
                 .set("customerId", customerId)
                 .set("fullName", "Test Customer")
                 .set("email", "test-" + customerKey.getId() + "@example.com")
-                .set("dob", Timestamp.of(java.sql.Timestamp.valueOf(dob.atStartOfDay())))
+                .set("dob", Timestamp.ofTimeSecondsAndNanos(dob.atStartOfDay(ZoneOffset.UTC).toEpochSecond(), 0))
                 .set("postcode", postcode.toUpperCase().trim())
                 .set("phone", "07000000000")
                 .set("addressLine1", "1 Test Street")
@@ -136,56 +148,65 @@ public abstract class BaseIntegrationTest {
                 .set("vehicleModel", "2024 Test Vehicle")
                 .set("registration", "AB24 TST")
                 .set("balancePence", 1200000L)
-                .set("apr", 6.9)
+                .set("apr", "6.9")
                 .set("originalTermMonths", 48)
                 .set("contractMileage", 10000)
                 .set("excessPricePerMilePence", 10L)
                 .set("lastPaymentPence", 45000L)
-                .set("lastPaymentDate", Timestamp.of(java.sql.Timestamp.valueOf(
-                        LocalDate.of(2026, 3, 1).atStartOfDay())))
+                .set("lastPaymentDate", Timestamp.ofTimeSecondsAndNanos(
+                        LocalDate.of(2026, 3, 1).atStartOfDay(ZoneOffset.UTC).toEpochSecond(), 0))
                 .set("nextPaymentPence", 45000L)
-                .set("nextPaymentDate", Timestamp.of(java.sql.Timestamp.valueOf(
-                        LocalDate.of(2026, 4, 1).atStartOfDay())))
+                .set("nextPaymentDate", Timestamp.ofTimeSecondsAndNanos(
+                        LocalDate.of(2026, 4, 1).atStartOfDay(ZoneOffset.UTC).toEpochSecond(), 0))
                 .set("paymentsRemaining", 24)
-                .set("finalPaymentDate", Timestamp.of(java.sql.Timestamp.valueOf(
-                        LocalDate.of(2028, 3, 1).atStartOfDay())))
+                .set("finalPaymentDate", Timestamp.ofTimeSecondsAndNanos(
+                        LocalDate.of(2028, 3, 1).atStartOfDay(ZoneOffset.UTC).toEpochSecond(), 0))
                 .build();
         datastore.put(agreement);
 
-        return customerKey.getId();
+        return new TestIds(customerKey.getId(), agreementKey.getId());
+    }
+
+    protected long createTestCustomer(LocalDate dob, String postcode, String agreementNumber) {
+        return createTestData(dob, postcode, agreementNumber).customerId();
     }
 
     protected String loginAs(String agreementNumber, LocalDate dob, String postcode) {
-        ResponseEntity<String> loginPage = restTemplate.getForEntity("/login", String.class);
-        String csrfToken = extractCsrfToken(loginPage.getBody());
-        String sessionCookie = extractSessionCookie(loginPage);
+        // Use a cookie-aware RestTemplate to handle session fixation transparently.
+        var cookieManager = new java.net.CookieManager();
+        java.net.CookieHandler.setDefault(cookieManager);
+        try {
+            var client = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+            var rt = new org.springframework.web.client.RestTemplate(client);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set(HttpHeaders.COOKIE, sessionCookie);
+            String baseUrl = "http://localhost:" + port;
 
-        String formattedDob = dob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            // GET /login — picks up session + CSRF cookies
+            ResponseEntity<String> loginPage = rt.getForEntity(baseUrl + "/login", String.class);
+            String csrfToken = extractCsrfToken(loginPage.getBody());
 
-        var formData = new LinkedMultiValueMap<String, String>();
-        formData.add("username", agreementNumber);
-        formData.add("password", formattedDob + "|" + postcode);
-        if (csrfToken != null) {
-            formData.add("_csrf", csrfToken);
-        }
-
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                "/login", new HttpEntity<>(formData, headers), String.class);
-
-        List<String> postCookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        if (postCookies != null) {
-            for (String cookie : postCookies) {
-                if (cookie.contains("AZADI_SESSION") || cookie.contains("SESSION")) {
-                    return cookie.split(";")[0];
-                }
+            // POST credentials — CookieHandler auto-sends cookies, follows 302
+            var formData = new LinkedMultiValueMap<String, String>();
+            formData.add("username", agreementNumber);
+            formData.add("password", dob.format(DOB_FORMATTER) + "|" + postcode);
+            if (csrfToken != null) {
+                formData.add("_csrf", csrfToken);
             }
-        }
 
-        return sessionCookie;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            rt.postForEntity(baseUrl + "/login", new HttpEntity<>(formData, headers), String.class);
+
+            // Extract the authenticated session cookie from the cookie store
+            return cookieManager.getCookieStore().getCookies().stream()
+                    .filter(c -> c.getName().contains("AZADI_SESSION") || c.getName().contains("SESSION"))
+                    .map(c -> c.getName() + "=" + c.getValue())
+                    .findFirst()
+                    .orElse("");
+        } finally {
+            java.net.CookieHandler.setDefault(null);
+        }
     }
 
     protected String extractCsrfToken(String html) {
@@ -201,21 +222,37 @@ public abstract class BaseIntegrationTest {
     }
 
     protected String extractSessionCookie(ResponseEntity<String> response) {
-        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        return (cookies != null && !cookies.isEmpty()) ? cookies.getFirst().split(";")[0] : "";
-    }
-
-    protected String buildCookieHeader(ResponseEntity<String> response, String sessionCookie) {
-        var cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        if (cookies != null && !cookies.isEmpty()) {
-            var newSession = cookies.stream()
+        return response.getHeaders().getOrEmpty(HttpHeaders.SET_COOKIE).stream()
                 .filter(c -> c.contains("AZADI_SESSION") || c.contains("SESSION"))
                 .map(c -> c.split(";")[0])
                 .findFirst()
-                .orElse(sessionCookie);
-            return newSession;
+                .orElse("");
+    }
+
+    protected String extractAllCookies(ResponseEntity<String> response) {
+        List<String> cookies = response.getHeaders().getOrEmpty(HttpHeaders.SET_COOKIE);
+        if (cookies.isEmpty()) {
+            return "";
         }
-        return sessionCookie;
+        return cookies.stream()
+                .map(c -> c.split(";")[0])
+                .collect(Collectors.joining("; "));
+    }
+
+    protected String buildCookieHeader(ResponseEntity<String> response, String sessionCookie) {
+        List<String> cookies = response.getHeaders().getOrEmpty(HttpHeaders.SET_COOKIE);
+        if (cookies.isEmpty()) {
+            return sessionCookie;
+        }
+        String responseCookies = cookies.stream()
+                .map(c -> c.split(";")[0])
+                .collect(Collectors.joining("; "));
+
+        if (sessionCookie != null && !sessionCookie.isEmpty()
+                && !responseCookies.contains(sessionCookie)) {
+            return sessionCookie + "; " + responseCookies;
+        }
+        return responseCookies;
     }
 
     protected HttpHeaders authenticatedHeaders(String sessionCookie) {

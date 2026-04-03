@@ -20,11 +20,11 @@ public class ViteDevConfig {
     private final String viteDevUrl;
 
     public ViteDevConfig(@Value("${azadi.vite-dev-url:}") String viteDevUrl) {
-        this.viteDevUrl = viteDevUrl.isBlank() ? null : viteDevUrl;
+        this.viteDevUrl = viteDevUrl.isBlank() ? "" : viteDevUrl;
     }
 
     @ModelAttribute("viteDevUrl")
     public String viteDevUrl() {
-        return viteDevUrl;
+        return viteDevUrl.isEmpty() ? null : viteDevUrl;
     }
 }

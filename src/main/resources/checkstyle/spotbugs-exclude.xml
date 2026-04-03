@@ -49,6 +49,23 @@
         </Or>
     </Match>
 
+    <!-- Spring-managed constructor injection: beans are singletons, not externally mutable -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Or>
+            <Class name="com.azadi.audit.AuditService"/>
+            <Class name="com.azadi.auth.AzadiAuthenticationProvider"/>
+            <Class name="com.azadi.email.EmailService"/>
+            <Class name="com.azadi.payment.StripePaymentService"/>
+        </Or>
+    </Match>
+
+    <!-- Email templates use \n for platform-consistent line endings in HTML email -->
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+        <Package name="com.azadi.email.templates"/>
+    </Match>
+
     <!-- Serialization not needed for Spring beans -->
     <Match>
         <Bug pattern="SE_BAD_FIELD"/>

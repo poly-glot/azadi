@@ -144,7 +144,9 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedDocuments(String customerId, JsonNode docsNode) {
-        if (docsNode == null || !docsNode.isArray()) return;
+        if (docsNode == null || !docsNode.isArray()) {
+            return;
+        }
         for (var docNode : docsNode) {
             var doc = new Document();
             doc.setCustomerId(customerId);

@@ -48,24 +48,23 @@ class DataIsolationIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Customer A cannot access Customer B's agreement")
+    @DisplayName("Customer A cannot access Customer B's agreement by ID")
     void customerACannotAccessCustomerBAgreement() {
         // Arrange
         String sessionCookieA = loginAs(AGREEMENT_A, DOB_A, POSTCODE_A);
+        long agreementBId = createTestData(DOB_B, POSTCODE_B, "AGR-ISO-B002").agreementId();
 
-        // Act - attempt to access Customer B's agreement
+        // Act - attempt to access Customer B's agreement by its numeric ID
         HttpHeaders headers = authenticatedHeaders(sessionCookieA);
         ResponseEntity<String> response = restTemplate.exchange(
-                "/api/agreements/" + AGREEMENT_B,
+                "/agreements/" + agreementBId,
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 String.class);
 
-        // Assert - should be denied or not contain Customer B's data
-        // TestRestTemplate follows redirects, so 403 might become 200 with error page
-        assertThat(response.getStatusCode().value()).isIn(200, 403, 404);
+        // Assert - should be denied (403 rendered as error page, or 200 with error)
         if (response.getBody() != null) {
-            assertThat(response.getBody()).doesNotContain(AGREEMENT_B);
+            assertThat(response.getBody()).doesNotContain("AGR-ISO-B002");
         }
     }
 

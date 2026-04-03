@@ -21,7 +21,8 @@ public class CspNonceFilter extends OncePerRequestFilter {
     private final String viteDevUrl;
 
     public CspNonceFilter(@Value("${azadi.vite-dev-url:}") String viteDevUrl) {
-        this.viteDevUrl = viteDevUrl.isBlank() ? null : viteDevUrl;
+        super();
+        this.viteDevUrl = viteDevUrl.isBlank() ? "" : viteDevUrl;
     }
 
     @Override
@@ -35,10 +36,10 @@ public class CspNonceFilter extends OncePerRequestFilter {
         request.setAttribute("cspNonce", nonce);
 
         // In dev mode, allow Vite dev server as script/style/connect source
-        var viteOrigin = viteDevUrl != null ? " " + viteDevUrl : "";
-        var viteWs = viteDevUrl != null
-            ? " " + viteDevUrl.replace("http://", "ws://")
-            : "";
+        var viteOrigin = viteDevUrl.isEmpty() ? "" : " " + viteDevUrl;
+        var viteWs = viteDevUrl.isEmpty()
+            ? ""
+            : " " + viteDevUrl.replace("http://", "ws://");
 
         var csp = String.join("",
             "default-src 'self'; ",

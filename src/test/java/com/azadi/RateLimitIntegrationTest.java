@@ -73,11 +73,11 @@ class RateLimitIntegrationTest extends BaseIntegrationTest {
     private ResponseEntity<String> performLoginAttempt(String agreementNumber, LocalDate dob, String postcode) {
         ResponseEntity<String> loginPage = restTemplate.getForEntity("/login", String.class);
         String csrfToken = extractCsrfToken(loginPage.getBody());
-        String sessionCookie = extractSessionCookie(loginPage);
+        String allCookies = extractAllCookies(loginPage);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set(HttpHeaders.COOKIE, sessionCookie);
+        headers.set(HttpHeaders.COOKIE, allCookies);
 
         String formattedDob = dob.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 

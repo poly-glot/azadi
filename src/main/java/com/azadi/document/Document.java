@@ -84,7 +84,7 @@ public class Document {
 
     public String getFileType() {
         if (fileName != null && fileName.contains(".")) {
-            return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+            return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase(java.util.Locale.ROOT);
         }
         return "pdf";
     }

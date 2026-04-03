@@ -5,6 +5,8 @@ spring:
         emulator:
           enabled: true
         project-id: test-project
+      secretmanager:
+        enabled: false
 
 server:
   servlet:
