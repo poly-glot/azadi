@@ -124,10 +124,7 @@ jobs:
         run: |
           STAGING_URL=$(gcloud run services describe ${{ env.CLOUD_RUN_SERVICE }} \
             --region ${{ env.GCP_REGION }} \
-            --format 'value(status.traffic[tag=staging].url)' 2>/dev/null || true)
-          if [ -z "$STAGING_URL" ]; then
-            STAGING_URL="https://staging---${{ env.CLOUD_RUN_SERVICE }}-$(gcloud run services describe ${{ env.CLOUD_RUN_SERVICE }} --region ${{ env.GCP_REGION }} --format='value(status.url)' | sed 's|https://||')"
-          fi
+            --format='value(status.traffic.url)' | tr ';' '\n' | grep staging | head -1)
           echo "Staging URL: $STAGING_URL"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${STAGING_URL}/actuator/health" || echo "000")
           echo "Health check: HTTP $STATUS"
@@ -141,6 +138,7 @@ jobs:
 
       - name: Deploy to Firebase Hosting (preview)
         run: |
+          mkdir -p src/main/resources/static
           firebase hosting:channel:deploy staging \
             --project ${{ env.GCP_PROJECT_ID }} \
             --expires 7d
@@ -185,6 +183,7 @@ jobs:
 
       - name: Deploy Firebase (hosting + indexes)
         run: |
+          mkdir -p src/main/resources/static
           firebase deploy --only hosting:${{ env.FIREBASE_SITE_ID }} \
             --project ${{ env.GCP_PROJECT_ID }}
 
@@ -212,7 +211,7 @@ jobs:
           echo "API: HTTP $STATUS"
           [ "$STATUS" -eq 200 ] || { echo "API smoke test FAILED"; exit 1; }
 
-          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" "https://azadi.web.app/" || echo "000")
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" "https://azadi.web.app/login" || echo "000")
           echo "Hosting: HTTP $STATUS"
           [ "$STATUS" -eq 200 ] || { echo "Hosting smoke test FAILED"; exit 1; }
 
