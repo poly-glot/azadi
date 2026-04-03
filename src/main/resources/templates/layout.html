@@ -26,7 +26,7 @@
   </th:block>
 
   <!--/* Prod mode: built, hashed assets */-->
-  <link th:if="${viteDevUrl == null}" rel="stylesheet" th:href="@{/assets/css/main.css}" th:attr="nonce=${cspNonce}">
+  <link th:if="${viteDevUrl == null}" rel="stylesheet" th:href="@{${viteAsset['css/main.css']}}" th:attr="nonce=${cspNonce}">
 </head>
 <body>
   <!-- Header -->
@@ -72,6 +72,6 @@
 
   <!--/* Dev: JS from Vite with HMR. Prod: built hashed JS. */-->
   <script th:if="${viteDevUrl}" type="module" th:src="${viteDevUrl + '/js/main.js'}" th:attr="nonce=${cspNonce}"></script>
-  <script th:if="${viteDevUrl == null}" type="module" th:src="@{/assets/js/main.js}" th:attr="nonce=${cspNonce}"></script>
+  <script th:if="${viteDevUrl == null}" type="module" th:src="@{${viteAsset['js/main.js']}}" th:attr="nonce=${cspNonce}"></script>
 </body>
 </html>

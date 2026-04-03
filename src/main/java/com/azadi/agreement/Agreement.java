@@ -3,7 +3,6 @@ package com.azadi.agreement;
 import com.google.cloud.spring.data.datastore.core.mapping.Entity;
 import org.springframework.data.annotation.Id;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity(name = "Agreement")
@@ -15,7 +14,7 @@ public class Agreement {
     private String customerId;
     private String type;
     private long balancePence;
-    private BigDecimal apr;
+    private String apr;
     private int originalTermMonths;
     private int contractMileage;
     private long excessPricePerMilePence;
@@ -69,11 +68,11 @@ public class Agreement {
         this.balancePence = balancePence;
     }
 
-    public BigDecimal getApr() {
+    public String getApr() {
         return apr;
     }
 
-    public void setApr(BigDecimal apr) {
+    public void setApr(String apr) {
         this.apr = apr;
     }
 

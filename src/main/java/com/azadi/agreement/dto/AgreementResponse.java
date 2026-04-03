@@ -29,7 +29,7 @@ public record AgreementResponse(
             agreement.getAgreementNumber(),
             agreement.getType(),
             formatPence(agreement.getBalancePence()),
-            agreement.getApr().toPlainString() + "%",
+            agreement.getApr() + "%",
             agreement.getOriginalTermMonths(),
             agreement.getContractMileage(),
             formatPence(agreement.getExcessPricePerMilePence()),

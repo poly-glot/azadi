@@ -15,6 +15,7 @@ export default defineConfig({
   build: {
     outDir: '../dist',
     emptyOutDir: true,
+    manifest: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/css/main.css'),

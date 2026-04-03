@@ -13,12 +13,11 @@ import tools.jackson.databind.json.JsonMapper;
 import com.google.cloud.spring.data.datastore.core.DatastoreTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -37,7 +36,6 @@ import java.util.List;
  * or restart Docker to re-seed).</p>
  */
 @Component
-@Profile("dev")
 public class DataSeeder implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataSeeder.class);
@@ -46,17 +44,23 @@ public class DataSeeder implements CommandLineRunner {
     private final DatastoreTemplate datastoreTemplate;
     private final BankDetailsEncryptor encryptor;
     private final JsonMapper objectMapper;
+    private final boolean seedEnabled;
 
     public DataSeeder(DatastoreTemplate datastoreTemplate,
                       BankDetailsEncryptor encryptor,
-                      JsonMapper objectMapper) {
+                      JsonMapper objectMapper,
+                      @Value("${azadi.seed-data:false}") boolean seedEnabled) {
         this.datastoreTemplate = datastoreTemplate;
         this.encryptor = encryptor;
         this.objectMapper = objectMapper;
+        this.seedEnabled = seedEnabled;
     }
 
     @Override
     public void run(String... args) throws Exception {
+        if (!seedEnabled) {
+            return;
+        }
         if (datastoreTemplate.findAll(SeedMarker.class).iterator().hasNext()) {
             LOG.info("Seed data already exists, skipping. "
                 + "To re-seed: docker compose down && docker compose up -d, then restart Spring Boot.");
@@ -100,7 +104,7 @@ public class DataSeeder implements CommandLineRunner {
         agreement.setCustomerId(customerId);
         agreement.setType(agr.get("type").asText());
         agreement.setBalancePence(agr.get("balancePence").asLong());
-        agreement.setApr(new BigDecimal(agr.get("apr").asText()));
+        agreement.setApr(agr.get("apr").asText());
         agreement.setOriginalTermMonths(agr.get("termMonths").asInt());
         agreement.setContractMileage(agr.get("contractMileage").asInt());
         agreement.setExcessPricePerMilePence(agr.get("excessPricePerMilePence").asLong());
