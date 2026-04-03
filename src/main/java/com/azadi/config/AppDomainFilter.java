@@ -54,7 +54,7 @@ public class AppDomainFilter {
                 if (active) {
                     filterChain.doFilter(
                             new DomainOverrideRequest(request, host, port, scheme),
-                            new DomainOverrideResponse(response, baseUrl));
+                            new DomainOverrideResponse(response, baseUrl, host));
                 } else {
                     filterChain.doFilter(request, response);
                 }
@@ -126,10 +126,12 @@ public class AppDomainFilter {
 
     static class DomainOverrideResponse extends HttpServletResponseWrapper {
         private final String baseUrl;
+        private final String host;
 
-        DomainOverrideResponse(HttpServletResponse response, String baseUrl) {
+        DomainOverrideResponse(HttpServletResponse response, String baseUrl, String host) {
             super(response);
             this.baseUrl = baseUrl;
+            this.host = host;
         }
 
         @Override
@@ -137,7 +139,13 @@ public class AppDomainFilter {
             if (location.startsWith("/")) {
                 super.sendRedirect(baseUrl + location);
             } else if (location.startsWith("http://") || location.startsWith("https://")) {
-                super.sendRedirect(location);
+                // Rewrite absolute URLs that point to the wrong host
+                if (!location.contains(host)) {
+                    var path = location.replaceFirst("https?://[^/]+", "");
+                    super.sendRedirect(baseUrl + path);
+                } else {
+                    super.sendRedirect(location);
+                }
             } else {
                 super.sendRedirect(baseUrl + "/" + location);
             }

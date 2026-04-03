@@ -14,6 +14,11 @@ public class AuthController {
         this.demoMode = demoMode;
     }
 
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/login";
+    }
+
     @GetMapping("/login")
     public String login(Model model) {
         model.addAttribute("demoMode", demoMode);
