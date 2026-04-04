@@ -3,8 +3,9 @@
 Online finance portal for Azadi, an imaginary luxury car manufacturer. Lets customers view agreements, settle payments,
 retrieve documents, and keep contact details up to date, all in one place.
 
-Built on Spring Boot 3.4 with Thymeleaf server-side rendering. Firestore (Datastore mode) for persistence, Stripe for
+Built on Spring Boot 4.0 with Thymeleaf server-side rendering. Firestore (Datastore mode) for persistence, Stripe for
 card payments, GraalVM native-image for fast cold starts. Deployed to Cloud Run behind Firebase Hosting.
+
 ---
 
 ## Table of Contents
@@ -279,17 +280,19 @@ docker run -p 8080:8080 --env-file local.env azadi-native
 
 ## Environment Variables
 
-| Variable                      | Default        | Description                                |
-|-------------------------------|----------------|--------------------------------------------|
-| `GCP_PROJECT_ID`              | `test-project` | GCP project ID                             |
-| `FIRESTORE_DB`                | `azadi`        | Firestore database name                    |
-| `FIRESTORE_EMULATOR_HOST`     | (none)         | Set to `localhost:8081` for local dev      |
-| `STRIPE_API_KEY`              | (none)         | Stripe secret key                          |
-| `STRIPE_WEBHOOK_SECRET`       | (none)         | Stripe webhook signing secret              |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | (none)         | Stripe publishable key (client-side)       |
-| `RESEND_API_KEY`              | (none)         | Resend email API key                       |
-| `AZADI_ENCRYPTION_KEY`        | (none)         | 32-char AES key for bank detail encryption |
-| `AZADI_ENCRYPTION_SALT`       | (none)         | Salt for encryption                        |
+| Variable                      | Default               | Description                                |
+|-------------------------------|-----------------------|--------------------------------------------|
+| `GCP_PROJECT_ID`              | `test-project`        | GCP project ID                             |
+| `FIRESTORE_DB`                | `azadi`               | Firestore database name                    |
+| `FIRESTORE_EMULATOR_HOST`     | (none)                | Set to `localhost:8081` for local dev      |
+| `STRIPE_API_KEY`              | (none)                | Stripe secret key                          |
+| `STRIPE_WEBHOOK_SECRET`       | (none)                | Stripe webhook signing secret              |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | (none)                | Stripe publishable key (client-side)       |
+| `RESEND_API_KEY`              | (none)                | Resend email API key                       |
+| `AZADI_ENCRYPTION_KEY`        | (none)                | 32-char AES key for bank detail encryption |
+| `AZADI_ENCRYPTION_SALT`       | (none)                | Salt for encryption                        |
+| `APP_DOMAIN`                  | `localhost:8080`      | Application domain (used for redirects)    |
+| `RESEND_FROM_EMAIL`           | `noreply@junaid.guru` | Sender address for transactional emails    |
 
 Copy `local.env` for local development -- it has test Stripe keys and emulator config pre-filled.
 
