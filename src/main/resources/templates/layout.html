@@ -29,7 +29,7 @@
   </th:block>
 
   <!--/* Prod mode: built, hashed assets */-->
-  <link th:if="${viteDevUrl == null}" rel="stylesheet" th:href="@{${viteAsset['css/main.css']}}" th:attr="nonce=${cspNonce}">
+  <link th:if="${viteDevUrl == null}" rel="stylesheet" th:href="@{${@viteManifestConfig.viteAsset()['css/main.css']}}" th:attr="nonce=${cspNonce}">
 </head>
 <body>
   <!-- Header -->

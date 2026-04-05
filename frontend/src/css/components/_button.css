@@ -85,6 +85,7 @@
   border-color: var(--color-white);
 }
 
-.c-button + .c-button {
+.c-button + .c-button,
+.c-button + form > .c-button {
   margin-inline-start: var(--spacing-small);
 }

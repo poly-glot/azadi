@@ -13,7 +13,9 @@
       <!-- Desktop nav (authenticated) -->
       <nav sec:authorize="isAuthenticated()" class="c-site-header__nav--desktop">
         <a th:href="@{/finance/make-a-payment}" class="c-button">Make a Payment</a>
-        <a th:href="@{/logout}" class="c-button c-button--secondary">Logout</a>
+        <form th:action="@{/logout}" method="post" class="c-site-header__logout-form">
+          <button type="submit" class="c-button c-button--secondary">Logout</button>
+        </form>
       </nav>
 
       <!-- Mobile hamburger (authenticated) -->
@@ -118,7 +120,9 @@
 
     <nav class="c-mobile-menu__shortcuts">
       <a th:href="@{/finance/make-a-payment}" class="c-button c-button--block">Make a Payment</a>
-      <a th:href="@{/logout}" class="c-button c-button--secondary c-button--block">Logout</a>
+      <form th:action="@{/logout}" method="post" class="c-mobile-menu__logout-form">
+        <button type="submit" class="c-button c-button--secondary c-button--block">Logout</button>
+      </form>
     </nav>
   </div>
 </header>
