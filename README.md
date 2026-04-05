@@ -152,6 +152,36 @@ devcontainer exec --workspace-folder . bash -c "cd /workspace && set -a && sourc
 
 `local.env` contains test Stripe keys and encryption secrets needed to start the app. The `dev` alias sources it automatically.
 
+### Running Spring Boot from IntelliJ (with the emulator)
+
+Prefer running the backend from the IDE for breakpoint debugging. Vite and the Firestore emulator still need to run separately (in terminals or via IntelliJ run configs).
+
+**1. Start the Firestore emulator** in a terminal and leave it running:
+
+```bash
+devcontainer exec --workspace-folder . zsh -ic fb-emulator
+# or locally:
+gcloud emulators firestore start --host-port=0.0.0.0:8081 --database-mode=datastore-mode --project=demo-azadi
+```
+
+**2. Create a Spring Boot run configuration** — _Run → Edit Configurations → + → Spring Boot_:
+
+| Field                 | Value                                                                |
+|-----------------------|----------------------------------------------------------------------|
+| Main class            | your `@SpringBootApplication` class under `src/main/java/com/azadi/` |
+| Active profiles       | `dev`                                                                |
+| Working directory     | `$MODULE_WORKING_DIR$` (repo root)                                   |
+| Environment variables | `FIRESTORE_EMULATOR_HOST=localhost:8081`                             |
+| VM options            | `--add-opens java.base/java.math=ALL-UNNAMED`                        |
+
+**3. Load `local.env`** — install the **EnvFile** plugin, open the run config's _EnvFile_ tab, and add `local.env`. It auto-injects every `KEY=VALUE` line alongside `FIRESTORE_EMULATOR_HOST`. (Alternative: paste each line manually into the _Environment variables_ field, semicolon-separated — fragile.)
+
+**4. Start Vite** — either run `npm run dev` in `frontend/` from a terminal, or add an IntelliJ npm run config pointing at `frontend/package.json`, script `dev`.
+
+**5. Run** the Spring Boot config (▶ or 🐞 for debug). App serves at **http://localhost:8080**, talks to the emulator on `:8081`, loads assets from Vite on `:5173`.
+
+> The emulator holds data in memory. Restart it to get a clean slate, then restart Spring Boot so it re-seeds from `src/main/resources/seed/customers.json`.
+
 Open **http://localhost:8080**. Login with any seeded customer (e.g. DOB `15/3/1985`, postcode `SW1A 1AA`, agreement `AGR-100001`).
 
 ### How It Works

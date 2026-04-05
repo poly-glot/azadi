@@ -22,21 +22,14 @@
 }
 
 .o-band--login {
-  background-image: url('../img/azadi-dashboard.png');
-  position: relative;
-}
-
-.o-band--login::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  z-index: 0;
-}
-
-.o-band--login > * {
-  position: relative;
-  z-index: 1;
+  /* Dark overlay is pre-baked into the image assets (35% brightness). */
+  background-color: #000;
+  background-image: url('../img/azadi-dashboard.jpg');
+  background-image: image-set(
+    url('../img/azadi-dashboard.avif') type('image/avif'),
+    url('../img/azadi-dashboard.webp') type('image/webp'),
+    url('../img/azadi-dashboard.jpg') type('image/jpeg')
+  );
 }
 
 .o-band--gray {

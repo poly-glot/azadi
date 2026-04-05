@@ -5,6 +5,10 @@
       lang="en">
 <head>
     <title>Login</title>
+    <th:block layout:fragment="head-preload">
+        <link rel="preload" as="image" type="image/avif"
+              th:href="@{/assets/img/azadi-dashboard.avif}" fetchpriority="high">
+    </th:block>
 </head>
 <body>
 <div layout:fragment="content-public">
